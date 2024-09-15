@@ -1,0 +1,588 @@
+options {
+    LOOKAHEAD = 2;
+}
+
+PARSER_BEGIN(AnalizadorLS)
+import java.util.ArrayList;
+
+class AnalizadorLS {
+    static ArrayList<String> guarda = AnalizadorLSTokenManager.errores;
+
+    public static void main(String[] args) {
+        try {
+            AnalizadorLS parser = new AnalizadorLS(System.in);
+            parser.ProgramaLS();
+
+            if (guarda.size() != 0) {
+                for (String error : guarda) {
+                    System.out.println(error);
+                }
+            } else {
+                System.out.println("Se compil\u00F3 con \u00E9xito");
+            }
+        } catch (ParseException e) {
+            System.out.println("Error En AnalizadorLS -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+        }
+    }
+
+    // Función para traducir mensajes de error
+    public static String traducirMensaje(String mensaje) {
+        if (mensaje.contains("Encountered")) {
+            mensaje = mensaje.replace("Encountered", "Se Encontr\u00F3: ");
+        }
+        if (mensaje.contains("at line")) {
+            mensaje = mensaje.replace("at line", "en la l\u00EDnea");
+        }
+        if (mensaje.contains("column")) {
+            mensaje = mensaje.replace("column", "y la columna");
+        }
+        if (mensaje.contains("Was expecting:")) {
+            mensaje = mensaje.replace("Was expecting:", "Posible Esperado: ");
+        }
+        if (mensaje.contains("Was expecting one of:")) {
+            mensaje = mensaje.replace("Was expecting one of:", "O Alguna Otra Opci\u00F3n: ");
+        }
+        return mensaje;
+    }
+}
+
+PARSER_END(AnalizadorLS)
+
+TOKEN_MGR_DECLS : {
+    static ArrayList<String> errores = new ArrayList<String>();
+}
+
+TOKEN: { // palabras reservadas
+    <ReservadaInicio: "INICIAR"> |
+    <Fin: "FINALIZAR"> |
+    <Start: "START"> |
+    <End: "END"> |
+    <Lectura: "Leer"> |
+    <Escritura: "Escribir"> |
+    <TipoDatoEntero: "Entero"> | 
+    <TipoDatoDecimal: "Decimal"> |
+    <TipoDatoCadena: "Cadena"> |
+    <TipoDatoCaracter: "Caracter"> |
+    <TipoDatoNoRetorno: "Void"> |
+    <TipoAmbitoPrivado: "Private"> |
+    <TipoAmbitoPublico: "Public"> |
+    <Caso: "Caso"> |
+    <Break: "Break"> |
+    <Default: "Default">
+}
+
+TOKEN: { // símbolos
+    <ParentesisAbre: "("> |
+    <ParentesisCierra: ")"> |
+    <CorcheteAbre: "["> |
+    <CorcheteCierra: "]"> |
+    <LlaveAbre: "{"> |
+    <LlaveCierra: "}"> |
+    <DelimitadorLineaDeCodigo: ";"> |
+    <Concatenacion: "#"> |
+    <DelimitadorCasoSwitch: ":">
+}
+
+TOKEN: { // operadores
+    <OperacionSuma: "+"> |
+    <OperacionResta: "-"> |
+    <OperacionMultiplicacion: "*"> |
+    <OperacionDivision: "/"> |
+    <Asignacion: "="> |
+    <Incremento: "++"> |
+    <Decremento: "--">
+}
+
+TOKEN: { // lógicas
+    <OperacionAnd: "&"> |
+    <OperacionOr: "|"> |
+    <OperacionNot: "!">
+}
+
+TOKEN: { // asignación
+    <OperacionIgualdad: "=="> |
+    <OperacionDesigualdad: "!="> |
+    <OperacionMayorQue: ">"> |
+    <OperacionMenorQue: "<"> |
+    <OperacionMayorOIgualQue: ">="> |
+    <OperacionMenorOIgualQue: "<=">
+}
+
+TOKEN :{
+    <Incre: "Incre"> |
+    <Decre: "Decre">
+}
+
+TOKEN: {
+    <CondicionalIf: "if"> |
+    <CondicionalSwitch: "Switch"> |
+    <CondicionalElse: "else">
+}
+
+TOKEN: {
+    <CicloFor: "For"> |
+    <CicloWhile: "While">
+}
+
+TOKEN: {
+    <Vector: "Vec"> |
+    <Matriz: "M">
+}
+
+TOKEN: {
+    <Funcion: "Fun"> |
+    <Procedimiento: "Pro">
+}
+
+TOKEN: {
+    <Numero: (["0"-"9"])+> |
+    <NumeroDecimal: (["0"-"9"])+("."["0"-"9"])+> |
+    <Cadenas_Palabras: "@" <texto> "@"> |
+    <texto: (["a"-"z","A"-"Z"])+>
+}
+
+TOKEN: {
+    <Constante: (["C"])(["A"-"Z","_"])(["A"-"Z","0"-"9","_"])*> |
+    <Variable: (["V"])(["a"])(["r"])(["a"-"z","A"-"Z","_"])(["a"-"z","A"-"Z","0"-"9","_"])*> |
+    <IdPrograma: (["A"])(["l"])(["g"])(["a"-"z","A"-"Z","_"])(["a"-"z","A"-"Z","0"-"9","_"])*>
+}
+
+SKIP: {
+    " " | "\r" | "\t" | "\n"
+}
+
+void ProgramaLS() : {}
+{
+    try {
+        <IdPrograma>
+        <ReservadaInicio>
+        (Sentencias())+
+        <Fin>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void Sentencias() : {}
+{
+    SentenciasFP() |
+    gramaticaLectura() |
+    gramaticaEscrita()
+    | gramaticaAsignarConstantes() 
+    | gramaticaVectores() 
+    | gramaticaMatrices() 
+    | gramaticaFunciones() 
+    | gramaticaProcedimientos() 
+    | gramaticaIf() 
+    | gramaticaElse()
+    | gramaticaSwitch() 
+    | gramaticaWhile() 
+    | gramaticaFor() 
+    | gramaticaAritmeticas()
+}
+
+void SentenciasLC() : {}
+{
+    (gramaticaLogicas() | gramaticaComparativas())+
+}
+
+void gramaticaLogicas() : {}
+{
+    gramaticaComparativas()
+    (<OperacionAnd> | <OperacionOr> | <OperacionNot>)
+    gramaticaComparativas()
+}
+
+void gramaticaComparativas() : {}
+{
+    <Variable> | <Numero>
+    <OperacionIgualdad> | <OperacionDesigualdad> | <OperacionMayorQue> | <OperacionMenorQue> | <OperacionMayorOIgualQue> | <OperacionMenorOIgualQue>
+    <Variable> | <Numero>
+}
+
+void SentenciasFP() : {}
+{
+    gramaticaVariableEntero() |
+    gramaticaVariableDecimal() |
+    gramaticaDatoCadena() |
+    gramaticaDatoCaracter()
+}
+
+void gramaticaVariableEntero() : {}
+{
+    try {
+        <TipoDatoEntero>
+        <Variable>
+        <Asignacion>
+        <Numero>
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaVariableDecimal() : {}
+{
+    try {
+        <TipoDatoDecimal>
+        <Variable>
+        <Asignacion>
+        <NumeroDecimal>
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaDatoCadena() : {}
+{
+    try {
+        <TipoDatoCadena>
+        <Variable>
+        <Asignacion>
+        <Cadenas_Palabras>
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaDatoCaracter() : {}
+{
+    try {
+        <TipoDatoCaracter>
+        <Variable>
+        <Asignacion>
+        <Cadenas_Palabras>
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaLectura() : {}
+{
+    try {
+        <Lectura>
+        (<Variable> | <Constante> | <Numero>)
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaEscrita() : {}
+{
+    try {
+        <Escritura>
+        (<Variable> | <Constante> | <Numero> | <Cadenas_Palabras>)
+        (<Concatenacion> (<Variable> | <Constante> | <Numero> | <Cadenas_Palabras>))*
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaAsignarVariables() : {}
+{
+    try {
+        <Variable>
+        (<TipoDatoEntero> | <TipoDatoDecimal> | <TipoDatoCadena> | <TipoDatoCaracter>)
+        <Asignacion>
+        <Numero>
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaAsignarConstantes() : {}
+{
+    try {
+        <Constante>
+        (<TipoDatoEntero> | <TipoDatoDecimal> | <TipoDatoCadena> | <TipoDatoCaracter>)
+        <Asignacion>
+        (<Variable> | <Constante> | <Numero> | <Cadenas_Palabras>)
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaVectores() : {}
+{
+    try {
+        <Vector>
+        (<TipoDatoEntero> | <TipoDatoDecimal>)
+        <CorcheteAbre>
+        (<Numero> | <NumeroDecimal>)
+        <CorcheteCierra>
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaMatrices() : {}
+{
+    try {
+        <Matriz>
+        (<TipoDatoEntero> | <TipoDatoDecimal>)
+        <CorcheteAbre>
+        (<Numero> | <NumeroDecimal>)
+        <CorcheteCierra>
+        <CorcheteAbre>
+        (<Numero> | <NumeroDecimal>)
+        <CorcheteCierra>
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaFunciones() : {}
+{
+    try {
+        <TipoAmbitoPublico> | <TipoAmbitoPrivado>
+        (<TipoDatoEntero> | <TipoDatoDecimal> | <TipoDatoCadena> | <TipoDatoCaracter>)
+        <Funcion>
+        <ParentesisAbre>
+        SentenciasFP()
+        <ParentesisCierra>
+        <Start>
+        Sentencias()
+        <End>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaProcedimientos() : {}
+{
+    try {
+        <TipoDatoNoRetorno>
+        <Procedimiento>
+        <ParentesisAbre>
+        <ParentesisCierra>
+        <Start>
+        (Sentencias())+
+        <End>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaIf() : {}
+{
+    try {
+        <CondicionalIf>
+        <LlaveAbre>
+        SentenciasLC()
+        <LlaveCierra>
+        <Start>
+        Sentencias()
+        <End>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaElse() : {}
+{
+    try {
+	<CondicionalElse>
+	<Start>
+        Sentencias()
+        <End>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void SentenciaSwitch() : {}
+{
+    try {
+        <Caso>
+        (<Numero> | <Cadenas_Palabras>)
+        <DelimitadorCasoSwitch>
+        Sentencias()
+        <Break>
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaSwitch() : {}
+{
+    try {
+        <CondicionalSwitch>
+        <LlaveAbre>
+        <Variable>
+        <LlaveCierra>
+        <Start>
+        SentenciaSwitch()
+        <End>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaWhile() : {}
+{
+    try {
+        <CicloWhile>
+        <LlaveAbre>
+        SentenciasLC()
+        <LlaveCierra>
+        <Start>
+        Sentencias()
+        <End>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaFor() : {}
+{
+    try {
+        <CicloFor>
+        <LlaveAbre>
+        gramaticaAsignarVariables()
+        gramaticaComparativas()
+        <DelimitadorLineaDeCodigo>
+        (gramaticaIncremento()|gramaticaDecremento())
+        <LlaveCierra>
+        <Start>
+        Sentencias()
+        <End>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaIncremento() : {}
+{
+    try {
+        <Incre>
+        <Variable>
+        <Incremento>
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaDecremento() : {}
+{
+    try {
+        <Decre>
+        <Variable>
+        <Decremento>
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
+
+void gramaticaAritmeticas() : {}
+{
+    try {
+        <Variable>
+        <Asignacion>
+        (<Variable> | <Numero>)
+        <OperacionSuma> | <OperacionMultiplicacion> | <OperacionResta> | <OperacionDivision>
+        <Variable>
+        <DelimitadorLineaDeCodigo>
+    } catch (ParseException e) {
+        Token t;
+        do {
+            t = getNextToken();
+        } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
+        AnalizadorLS.guarda.add("Error En La Sintaxis -> " + AnalizadorLS.traducirMensaje(e.getMessage()));
+    }
+}
