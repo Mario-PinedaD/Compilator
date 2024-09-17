@@ -1,0 +1,32 @@
+Alg_Hola
+INICIAR
+Entero V1 = 0;
+Entero V2 = 5;
+Cadena VCad1 = @Mayor@;
+Cadena VCad2 = @Menor@;
+
+Escribir VarCadmenor1;
+if {VarNum1 < VarNum2}
+START
+	Escribir VarNum1;
+END
+
+Escribir VarCadmayor1;
+if {VarNum1 > VarNum2}
+START
+	Escribir VarNum1;
+END 
+
+Escribir VarCadmenor1;
+if VarNum1 < VarNum2}
+START
+	Escribir VarNum2;
+END
+
+Escribir VarCadmayor1;
+if {VarNum1 > VarNum2}
+START
+	Escribir VarNum2;
+END 
+
+FINALIZAR

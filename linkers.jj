@@ -10,14 +10,16 @@ import java.util.Map;
 
 class linkers {
 
+	//Lista de errores sintácticos
     static ArrayList<String> tabla = linkersTokenManager.tablaErrores;
+	//Lista de errores semánticos
     static Map<String, String> declaredVariables = new HashMap<String, String>();
 
     public static void main(String[] args) {
         try {
             linkers link = new linkers(System.in);
             link.Programalink();
-
+		//Esto es para comprobar errores sintácticos
             if (!link.tabla.isEmpty()) {
                 System.out.println("\u001B[31m\nErrores encontrados:\n\u001B[0m");
                 for (String error : link.tabla) {
