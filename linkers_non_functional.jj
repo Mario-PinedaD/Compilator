@@ -10,14 +10,16 @@ import java.util.Map;
 
 class linkers {
 
+	//Lista de errores sintácticos
     static ArrayList<String> tabla = linkersTokenManager.tablaErrores;
+	//Lista de errores semánticos
     static Map<String, String> declaredVariables = new HashMap<String, String>();
 
     public static void main(String[] args) {
         try {
             linkers link = new linkers(System.in);
             link.Programalink();
-
+		//Esto es para comprobar errores sintácticos
             if (!link.tabla.isEmpty()) {
                 System.out.println("\u001B[31m\nErrores encontrados:\n\u001B[0m");
                 for (String error : link.tabla) {
@@ -121,6 +123,7 @@ TOKEN: {
     | <NUMERO_FLOTANTE: (["0"-"9"])+"."(["0"-"9"])+> 
     | <NUMERO: (["0"-"9"])+>    
     | <#LETRA: (["A"-"Z","a"-"z","á","é","í","ó","ú"])+>  
+    | <IdPrograma: (["A"])(["l"])(["g"])(["a"-"z","A"-"Z","_"])(["a"-"z","A"-"Z","0"-"9","_"])*>
 }
 
 SKIP: {
@@ -138,6 +141,7 @@ void Programalink() : {}{
 
     try {
         (
+            <IdPrograma>
             try{<ReservadaInicio> }catch(ParseException e){tabla.add("Error de Sintaxis -> " + e.getMessage());}
             try{<LlaveAbre> }catch(ParseException e){tabla.add("Error de Sintaxis -> " + e.getMessage());}
             
