@@ -3,11 +3,17 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.*;
 
 class linkers implements linkersConstants {
 
     static ArrayList<String> tabla = linkersTokenManager.tablaErrores;
     static Map<String, String> declaredVariables = new HashMap<String, String>();
+    static int tmpContador = 0;
+    static int labelContador = 0;
+    static List<String> code = new ArrayList<>();
+    static String varCondicion = "", varCadena = "";
+    static List<String> sentencias = new ArrayList<>();
 
     public static void main(String[] args) {
         try {
@@ -21,6 +27,11 @@ class linkers implements linkersConstants {
                 }
             } else {
                 System.out.println("\u001b[32mAn\u00e1lisis exitoso\u001b[0m");
+
+        //Para el código intermedio
+        for (String instruction : code) {
+                    System.out.println(instruction);
+                }
             }
 
         } catch (ParseException e) {
@@ -34,6 +45,22 @@ class linkers implements linkersConstants {
         } else {
             declaredVariables.put(id.image, type);
         }
+    }
+
+    static String newTemp(){
+            return "t" + tmpContador++;
+    }
+
+    static String nuevoLabel(){
+        return "L" + labelContador++;
+    }
+
+    static void addInstruccion(String instruccion){
+        code.add(instruccion);
+    }
+
+    static void addOperacion(String resultado, String op1, String operador, String op2){
+        code.add(resultado + " = " + op1 + " " + operador + " " + op2);
     }
 
   static final public void Programalink() throws ParseException {
@@ -186,7 +213,7 @@ void declararVariables() throws ParseException {
     }
 }
 
-  static final public void VariableINT() throws ParseException {Token id;
+  static final public void VariableINT() throws ParseException {Token id, tmpValor;
     int line, column;
     try {
       jj_consume_token(TipoDatoEntero);
@@ -198,7 +225,8 @@ line = id.beginLine;
       case Asignacion:{
         jj_consume_token(Asignacion);
         try {
-          jj_consume_token(NUMERO);
+          tmpValor = jj_consume_token(NUMERO);
+addInstruccion(id.image + " = " + tmpValor.image);
         } catch (ParseException e) {
 linkers.tabla.add("Error Sem\u00e1ntico -> " + e.getMessage());
         }
@@ -218,7 +246,7 @@ Token t;
     }
 }
 
-  static final public void VariableFLOAT() throws ParseException {Token id;
+  static final public void VariableFLOAT() throws ParseException {Token id, tmpValor;
     int line, column;
     try {
       jj_consume_token(TipoDatoDecimal);
@@ -230,7 +258,8 @@ line = id.beginLine;
       case Asignacion:{
         jj_consume_token(Asignacion);
         try {
-          jj_consume_token(NUMERO_FLOTANTE);
+          tmpValor = jj_consume_token(NUMERO_FLOTANTE);
+addInstruccion(id.image + " = " + tmpValor.image);
         } catch (ParseException e) {
 linkers.tabla.add("Error Sem\u00e1ntico -> " + e.getMessage());
         }
@@ -241,6 +270,7 @@ linkers.tabla.add("Error Sem\u00e1ntico -> " + e.getMessage());
         ;
       }
       jj_consume_token(DelimitadorLineaDeCodigo);
+
     } catch (ParseException e) {
 Token t;
         do {
@@ -250,7 +280,7 @@ Token t;
     }
 }
 
-  static final public void VariableBOOLEAN() throws ParseException {Token id;
+  static final public void VariableBOOLEAN() throws ParseException {Token id,tmpValor;
     int line, column;
     try {
       jj_consume_token(TipoDatoBooleano);
@@ -264,11 +294,13 @@ line = id.beginLine;
         try {
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case VERDADERO:{
-            jj_consume_token(VERDADERO);
+            tmpValor = jj_consume_token(VERDADERO);
+addInstruccion(id.image + " = " + tmpValor.image);
             break;
             }
           case FALSO:{
-            jj_consume_token(FALSO);
+            tmpValor = jj_consume_token(FALSO);
+addInstruccion(id.image + " = " + tmpValor.image);
             break;
             }
           default:
@@ -353,7 +385,7 @@ Token t;
     }
 }
 
-  static final public void salida() throws ParseException {
+  static final public void salida() throws ParseException {varCadena = "";
     try {
       jj_consume_token(Escritura);
       try {
@@ -365,11 +397,15 @@ Token token = getToken(1);
 
         if (token.kind == linkersConstants.CADENA) {
             jj_consume_token(linkersConstants.CADENA);
+            varCadena += token.image;
+
         } else if (token.kind == linkersConstants.IDENTIFICADOR) {
             jj_consume_token(linkersConstants.IDENTIFICADOR);
             if (!linkers.declaredVariables.containsKey(token.image)) {
                 linkers.tabla.add("Error Sem\u00e1ntico en salida-> Variable no declarada: " + token.image + " en l\u00ednea " + token.beginLine + ", columna " + token.beginColumn);
             }
+            varCadena += token.image;
+
         } else {
             linkers.tabla.add("Error de Sintaxis -> Se esperaba una cadena o un identificador, pero se encontr\u00f3: " + token.image + " en l\u00ednea " + token.beginLine + ", columna " + token.beginColumn);
             jj_consume_token(token.kind); // Consumir el token inesperado para continuar
@@ -380,11 +416,13 @@ Token token = getToken(1);
             token = getToken(1);
             if (token.kind == linkersConstants.CADENA) {
                 jj_consume_token(linkersConstants.CADENA);
+                varCadena += token.image + " ";
             } else if (token.kind == linkersConstants.IDENTIFICADOR) {
                 jj_consume_token(linkersConstants.IDENTIFICADOR);
                 if (!linkers.declaredVariables.containsKey(token.image)) {
                     linkers.tabla.add("Error Sem\u00e1ntico en salida-> Variable no declarada: " + token.image + " en l\u00ednea " + token.beginLine + ", columna " + token.beginColumn);
                 }
+                varCadena += token.image + " ";
             } else {
                 linkers.tabla.add("Error de Sintaxis -> Se esperaba una cadena o un identificador, pero se encontr\u00f3: " + token.image + " en l\u00ednea " + token.beginLine + ", columna " + token.beginColumn);
                 jj_consume_token(token.kind); // Consumir el token inesperado para continuar
@@ -397,6 +435,7 @@ linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
       try {
         jj_consume_token(DelimitadorLineaDeCodigo);
+addInstruccion("print " + varCadena);
       } catch (ParseException e) {
 linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
@@ -411,9 +450,11 @@ Token t;
 
 /////////////////////////////////////////     CONDICIONALES   //////////////////////////////////////////////
   static final public 
-void condicionalIf() throws ParseException {
+void condicionalIf() throws ParseException {Token id;
+    String L1 = nuevoLabel();
+    String L2 = nuevoLabel();
     try {
-      jj_consume_token(CondicionalIf);
+      id = jj_consume_token(CondicionalIf);
       try {
         jj_consume_token(ParentesisAbre);
       } catch (ParseException e) {
@@ -422,6 +463,8 @@ linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
       condicion();
       try {
         jj_consume_token(ParentesisCierra);
+addInstruccion(id.image + " " + varCondicion + " " + "goto " + L1);
+                addInstruccion(L1 + ":");
       } catch (ParseException e) {
 linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
@@ -463,6 +506,7 @@ linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
         jj_consume_token(CondicionalElse);
         try {
           jj_consume_token(LlaveAbre);
+addInstruccion(L2 + ":");
         } catch (ParseException e) {
 linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
@@ -668,9 +712,11 @@ linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
 }
 
 /////////////////////////////////////////////     CICLOS      //////////////////////////////////////////
-  static final public void cicloFor() throws ParseException {
+  static final public void cicloFor() throws ParseException {Token id;
+    String L1 = nuevoLabel();
+    String L2 = nuevoLabel();
     try {
-      jj_consume_token(CicloFor);
+      id = jj_consume_token(CicloFor);
       try {
         jj_consume_token(ParentesisAbre);
       } catch (ParseException e) {
@@ -692,9 +738,15 @@ linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
         jj_consume_token(-1);
         throw new ParseException();
       }
+      try {
+        jj_consume_token(DelimitadorLineaDeCodigo);
+      } catch (ParseException e) {
+linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
+      }
       condicion();
       try {
         jj_consume_token(DelimitadorLineaDeCodigo);
+addInstruccion(id.image + varCondicion + "goto " + L1);
       } catch (ParseException e) {
 linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
@@ -736,6 +788,7 @@ linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
       try {
         jj_consume_token(LlaveCierra);
+addInstruccion("goto " + L1);
       } catch (ParseException e) {
 linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
@@ -744,9 +797,12 @@ linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
 }
 
-  static final public void cicloWhile() throws ParseException {
+  static final public void cicloWhile() throws ParseException {Token id;
+    String L1, L2;
+    L1 = nuevoLabel();
+    L2 = nuevoLabel();
     try {
-      jj_consume_token(CicloWhile);
+      id = jj_consume_token(CicloWhile);
       try {
         jj_consume_token(ParentesisAbre);
       } catch (ParseException e) {
@@ -786,6 +842,9 @@ linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
         sentencias();
       }
+addInstruccion(L1 + ":");
+            addInstruccion(id.image +  " " + varCondicion + " goto " + L1);
+            addInstruccion (L2 + ":");
       try {
         jj_consume_token(LlaveCierra);
       } catch (ParseException e) {
@@ -817,15 +876,21 @@ linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
 }
 
-  static final public void condicionSimple() throws ParseException {Token token1, token2;
+  static final public void condicionSimple() throws ParseException {Token token1, token2, tokenoperador;
     String type1 = "", type2 = "";
 token1 = valor();
         type1 = verificarExistenciaYObtenerTipo(token1);
 
-        operadorRelacional();
+        tokenoperador = operadorRelacional();
 
         token2 = valor();
         type2 = verificarExistenciaYObtenerTipo(token2);
+
+        {
+            String resultado = token1.image + tokenoperador.image + token2.image;
+            addInstruccion(resultado);
+            varCondicion = token1.image + tokenoperador.image + token2.image;
+        }
 
         if (!type1.equals(type2) && !type1.equals("error") && !type2.equals("error")) {
             linkers.tabla.add("Error Sem\u00e1ntico en condici\u00f3n-> Tipos incompatibles en la condici\u00f3n: " + type1 + " y " + type2 + " en l\u00ednea " + token1.beginLine + ", columna " + token1.beginColumn);
@@ -835,30 +900,30 @@ token1 = valor();
 /////////////////////////////////////////    OPERADORES     //////////////////////////////////////////////
   static final public 
 
-void operadorRelacional() throws ParseException {
+Token operadorRelacional() throws ParseException {Token id;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case OperacionMayorQue:{
-      jj_consume_token(OperacionMayorQue);
+      id = jj_consume_token(OperacionMayorQue);
       break;
       }
     case OperacionMenorQue:{
-      jj_consume_token(OperacionMenorQue);
+      id = jj_consume_token(OperacionMenorQue);
       break;
       }
     case OperacionMenorOIgualQue:{
-      jj_consume_token(OperacionMenorOIgualQue);
+      id = jj_consume_token(OperacionMenorOIgualQue);
       break;
       }
     case OperacionMayorOIgualQue:{
-      jj_consume_token(OperacionMayorOIgualQue);
+      id = jj_consume_token(OperacionMayorOIgualQue);
       break;
       }
     case OperacionIgualdad:{
-      jj_consume_token(OperacionIgualdad);
+      id = jj_consume_token(OperacionIgualdad);
       break;
       }
     case OperacionDesigualdad:{
-      jj_consume_token(OperacionDesigualdad);
+      id = jj_consume_token(OperacionDesigualdad);
       break;
       }
     default:
@@ -866,9 +931,11 @@ void operadorRelacional() throws ParseException {
       jj_consume_token(-1);
       throw new ParseException();
     }
+{if ("" != null) return id;}
+    throw new Error("Missing return statement in function");
 }
 
-  static final public void operadorLogico() throws ParseException {
+  static final public void operadorLogico() throws ParseException {Token id;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case OperacionAnd:{
       jj_consume_token(OperacionAnd);

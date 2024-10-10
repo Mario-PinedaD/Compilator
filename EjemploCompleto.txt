@@ -25,13 +25,10 @@ INICIAR {
 	Caso 2:
 		Escribir("Esta es una prueba del switch 2");
 		Break;
+	Default:
+		Escribir("jiji");
    }
 
-
-
-   For(Entero var; var<10; var+100){
-	Escribir("Holi caracoli");
-   }
 
    While( c < 10.0){
 	Escribir("PRUEBA WHILE");

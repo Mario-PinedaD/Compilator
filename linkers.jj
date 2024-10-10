@@ -7,11 +7,17 @@ PARSER_BEGIN(linkers)
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.*;
 
 class linkers {
 
     static ArrayList<String> tabla = linkersTokenManager.tablaErrores;
     static Map<String, String> declaredVariables = new HashMap<String, String>();
+    static int tmpContador = 0;
+    static int labelContador = 0;
+    static List<String> code = new ArrayList<>();
+    static String varCondicion = "", varCadena = "";
+    static List<String> sentencias = new ArrayList<>();
 
     public static void main(String[] args) {
         try {
@@ -25,6 +31,11 @@ class linkers {
                 }
             } else {
                 System.out.println("\u001B[32mAnálisis exitoso\u001B[0m");
+		
+        //Para el código intermedio
+        for (String instruction : code) {
+		    System.out.println(instruction);
+		}
             }
 
         } catch (ParseException e) {
@@ -38,6 +49,22 @@ class linkers {
         } else {
             declaredVariables.put(id.image, type);
         }
+    }
+  
+    static String newTemp(){
+	    return "t" + tmpContador++;
+    }
+
+    static String nuevoLabel(){
+        return "L" + labelContador++;
+    }
+
+    static void addInstruccion(String instruccion){
+        code.add(instruccion);
+    }
+
+    static void addOperacion(String resultado, String op1, String operador, String op2){
+	code.add(resultado + " = " + op1 + " " + operador + " " + op2);
     }
 }
 
@@ -209,7 +236,7 @@ void declararVariables() : {} {
 }
 
 void VariableINT() : {
-    Token id;
+    Token id, tmpValor;
     int line, column;
 } {
     try {
@@ -220,7 +247,9 @@ void VariableINT() : {
             column = id.beginColumn;
             linkers.checkAndAddVariable(id, "int", line, column);
         }
-        [ <Asignacion> try { <NUMERO> } catch (ParseException e) { linkers.tabla.add("Error Semántico -> " + e.getMessage()); } ]
+        [ <Asignacion> try { tmpValor = <NUMERO> {
+            addInstruccion(id.image + " = " + tmpValor.image);
+        } } catch (ParseException e) { linkers.tabla.add("Error Semántico -> " + e.getMessage()); } ]
         <DelimitadorLineaDeCodigo>
     } catch (ParseException e) {
         Token t;
@@ -232,7 +261,7 @@ void VariableINT() : {
 }
 
 void VariableFLOAT() : {
-    Token id;
+    Token id, tmpValor;
     int line, column;
 } {
     try {
@@ -243,8 +272,12 @@ void VariableFLOAT() : {
             column = id.beginColumn;
             linkers.checkAndAddVariable(id, "float", line, column);
         }
-        [ <Asignacion> try { <NUMERO_FLOTANTE> } catch (ParseException e) { linkers.tabla.add("Error Semántico -> " + e.getMessage()); } ]
-        <DelimitadorLineaDeCodigo>
+        [ <Asignacion> try { tmpValor = <NUMERO_FLOTANTE>{
+            addInstruccion(id.image + " = " + tmpValor.image);
+        } } catch (ParseException e) { linkers.tabla.add("Error Semántico -> " + e.getMessage()); } ]
+        <DelimitadorLineaDeCodigo>{
+            
+        }
     } catch (ParseException e) {
         Token t;
         do {
@@ -255,7 +288,7 @@ void VariableFLOAT() : {
 }
 
 void VariableBOOLEAN() : {
-    Token id;
+    Token id,tmpValor;
     int line, column;
 } {
     try {
@@ -266,7 +299,11 @@ void VariableBOOLEAN() : {
             column = id.beginColumn;
             linkers.checkAndAddVariable(id, "boolean", line, column);
         }
-        [ <Asignacion> try { (<VERDADERO> | <FALSO>) } catch (ParseException e) { linkers.tabla.add("Error Semántico -> " + e.getMessage()); } ]
+        [ <Asignacion> try { (tmpValor = <VERDADERO>{
+            addInstruccion(id.image + " = " + tmpValor.image);
+        } | tmpValor = <FALSO>{
+            addInstruccion(id.image + " = " + tmpValor.image);
+        }) } catch (ParseException e) { linkers.tabla.add("Error Semántico -> " + e.getMessage()); } ]
         <DelimitadorLineaDeCodigo>
     } catch (ParseException e) {
         Token t;
@@ -344,7 +381,9 @@ void entrada() : {} {
 }
 
 
-void salida() : {} {
+void salida() : {
+    varCadena = "";
+} {
     try {
         <Escritura>
         try {
@@ -357,11 +396,15 @@ void salida() : {} {
         
         if (token.kind == linkersConstants.CADENA) {
             jj_consume_token(linkersConstants.CADENA);
+            varCadena += token.image;
+            
         } else if (token.kind == linkersConstants.IDENTIFICADOR) {
             jj_consume_token(linkersConstants.IDENTIFICADOR);
             if (!linkers.declaredVariables.containsKey(token.image)) {
                 linkers.tabla.add("Error Semántico en salida-> Variable no declarada: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
             }
+            varCadena += token.image;
+            
         } else {
             linkers.tabla.add("Error de Sintaxis -> Se esperaba una cadena o un identificador, pero se encontró: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
             jj_consume_token(token.kind); // Consumir el token inesperado para continuar
@@ -372,11 +415,13 @@ void salida() : {} {
             token = getToken(1);
             if (token.kind == linkersConstants.CADENA) {
                 jj_consume_token(linkersConstants.CADENA);
+                varCadena += token.image + " ";
             } else if (token.kind == linkersConstants.IDENTIFICADOR) {
                 jj_consume_token(linkersConstants.IDENTIFICADOR);
                 if (!linkers.declaredVariables.containsKey(token.image)) {
                     linkers.tabla.add("Error Semántico en salida-> Variable no declarada: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
                 }
+                varCadena += token.image + " ";
             } else {
                 linkers.tabla.add("Error de Sintaxis -> Se esperaba una cadena o un identificador, pero se encontró: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
                 jj_consume_token(token.kind); // Consumir el token inesperado para continuar
@@ -389,10 +434,13 @@ void salida() : {} {
             linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
         try {
-            <DelimitadorLineaDeCodigo>
+            <DelimitadorLineaDeCodigo>{
+                addInstruccion("print " + varCadena);
+            }
         } catch (ParseException e) {
             linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
+        
     } catch (ParseException e) {
         Token t;
         do {
@@ -404,9 +452,13 @@ void salida() : {} {
 
 /////////////////////////////////////////     CONDICIONALES   //////////////////////////////////////////////
 
-void condicionalIf() : {} {
+void condicionalIf() : {
+    Token id;
+    String L1 = nuevoLabel();
+    String L2 = nuevoLabel();
+} {
     try {
-        <CondicionalIf>
+        id = <CondicionalIf>
         try {
             <ParentesisAbre>
         } catch (ParseException e) {
@@ -414,7 +466,10 @@ void condicionalIf() : {} {
         }
         condicion()
         try {
-            <ParentesisCierra>
+            <ParentesisCierra>{
+                addInstruccion(id.image + " " + varCondicion + " " + "goto " + L1);
+                addInstruccion(L1 + ":");
+            }
         } catch (ParseException e) {
             linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
@@ -434,7 +489,9 @@ void condicionalIf() : {} {
         [ 
             <CondicionalElse>
             try {
-                <LlaveAbre>
+                <LlaveAbre>{
+                    addInstruccion(L2 + ":");
+                }
             } catch (ParseException e) {
                 linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
             }
@@ -480,7 +537,9 @@ void condicionalIfthen() : {} {
     }
 }
 
-void condicionalSwitch() : {} {
+void condicionalSwitch() : {
+    Token id;
+} {
     try {
         <CondicionalSwitch>
         try {
@@ -534,9 +593,13 @@ void condicionalSwitch() : {} {
     }
 }
 /////////////////////////////////////////////     CICLOS      //////////////////////////////////////////
-void cicloFor() : {} {
+void cicloFor() : {
+    Token id;
+    String L1 = nuevoLabel();
+    String L2 = nuevoLabel();
+} {
     try {
-        <CicloFor>
+        id = <CicloFor>
         try {
             <ParentesisAbre>
         } catch (ParseException e) {
@@ -544,9 +607,18 @@ void cicloFor() : {} {
         }
 
         (declararVariables() | asignacion())
+	try{
+	    <DelimitadorLineaDeCodigo>
+	} catch (ParseException e){
+	    linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
+	}
+
         condicion()
+
         try {
-            <DelimitadorLineaDeCodigo>
+            <DelimitadorLineaDeCodigo>{
+                addInstruccion(id.image + varCondicion + "goto " + L1);
+            }
         } catch (ParseException e) {
             linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
@@ -568,7 +640,9 @@ void cicloFor() : {} {
 
         (sentencias())*
         try {
-            <LlaveCierra>
+            <LlaveCierra>{
+                addInstruccion("goto " + L1);
+            }
         } catch (ParseException e) {
             linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
@@ -577,14 +651,22 @@ void cicloFor() : {} {
     }
 }
 
-void cicloWhile() : {} {
+void cicloWhile() : {
+    Token id;
+    String L1, L2;
+    L1 = nuevoLabel();
+    L2 = nuevoLabel();
+} {
+    
     try {
-        <CicloWhile>
+        id = <CicloWhile>
+    
         try {
             <ParentesisAbre>
         } catch (ParseException e) {
             linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
+        //se añade la condición
         condicion()
         try {
             <ParentesisCierra>
@@ -596,7 +678,12 @@ void cicloWhile() : {} {
         } catch (ParseException e) {
             linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
-        (sentencias())*
+        (sentencias())* {
+            addInstruccion(L1 + ":");
+            addInstruccion(id.image +  " " + varCondicion + " goto " + L1);
+            addInstruccion (L2 + ":");
+        }
+        
         try {
             <LlaveCierra>
         } catch (ParseException e) {
@@ -616,49 +703,66 @@ void condicion() : {} {
 }
 
 void condicionSimple() : {
-    Token token1, token2;
+    Token token1, token2, tokenoperador;
     String type1 = "", type2 = "";
 } {
     {
         token1 = valor();
         type1 = verificarExistenciaYObtenerTipo(token1);
         
-        operadorRelacional();
+        tokenoperador = operadorRelacional();
         
         token2 = valor();
         type2 = verificarExistenciaYObtenerTipo(token2);
         
+        {
+            String resultado = token1.image + tokenoperador.image + token2.image;
+            addInstruccion(resultado);
+            varCondicion = token1.image + tokenoperador.image + token2.image;
+        }
+
         if (!type1.equals(type2) && !type1.equals("error") && !type2.equals("error")) {
             linkers.tabla.add("Error Semántico en condición-> Tipos incompatibles en la condición: " + type1 + " y " + type2 + " en línea " + token1.beginLine + ", columna " + token1.beginColumn);
         }
     }
 }
 
+
 /////////////////////////////////////////    OPERADORES     //////////////////////////////////////////////
 
 
-void operadorRelacional() : {} {
+Token operadorRelacional() : {
+    Token id;
+} {
     (
-        <OperacionMayorQue>
-        | <OperacionMenorQue>
-        | <OperacionMenorOIgualQue>
-        | <OperacionMayorOIgualQue>
-        | <OperacionIgualdad>
-        | <OperacionDesigualdad>
+          id = <OperacionMayorQue>
+        | id = <OperacionMenorQue>
+        | id = <OperacionMenorOIgualQue>
+        | id = <OperacionMayorOIgualQue>
+        | id = <OperacionIgualdad>
+        | id = <OperacionDesigualdad>
     )
+    {
+        return id;
+    }
 }
 
-void operadorLogico() : {} {
+void operadorLogico() : {
+    Token id;
+} {
     (
-        <OperacionAnd>
-        | <OperacionOr>
+        <OperacionAnd> 
+        | <OperacionOr> 
 	    | <OperacionNot>
     )
+
 }
 
 void operadorAritmetico() : {} {
     (<OperacionSuma> | <OperacionResta> | <OperacionMultiplicacion> | <OperacionDivision> | <OperacionResiduo>)
 }
+
+
 /////////////////////////////////////////    METODOS PARA FASE SEMANTICA     //////////////////////////////////////////////
 //En esta parte se consumen almacenan y comparan los token existentes para hacer funcionar 
 //la fase semantica en ciclos y condiciones
