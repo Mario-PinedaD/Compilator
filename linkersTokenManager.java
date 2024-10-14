@@ -3,7 +3,9 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /** Token Manager. */
 @SuppressWarnings ("unused")
@@ -17,7 +19,7 @@ public class linkersTokenManager implements linkersConstants {
         } else {
             errorMessage += "\"" + curChar + "\" encontrado, pero esperaba m\u00e1s caracteres.";
         }
-        tablaErrores.add(errorMessage);
+        linkers.tabla.add(errorMessage); // Corregido para apuntar a 'tabla'
     }
 
   /** Debug output. */
@@ -35,9 +37,9 @@ private static final int jjStopStringLiteralDfa_0(int pos, long active0){
          }
          return -1;
       case 1:
-         if ((active0 & 0x30L) != 0L)
+         if ((active0 & 0x50L) != 0L)
             return 13;
-         if ((active0 & 0x3ffceL) != 0L)
+         if ((active0 & 0x3ffaeL) != 0L)
          {
             if (jjmatchedPos != 1)
             {
@@ -58,19 +60,19 @@ private static final int jjStopStringLiteralDfa_0(int pos, long active0){
          }
          return -1;
       case 3:
-         if ((active0 & 0x3f5aaL) != 0L)
+         if ((active0 & 0x3f5caL) != 0L)
          {
             jjmatchedKind = 40;
             jjmatchedPos = 3;
             return 13;
          }
-         if ((active0 & 0x844L) != 0L)
+         if ((active0 & 0x824L) != 0L)
             return 13;
          return -1;
       case 4:
          if ((active0 & 0x5100L) != 0L)
             return 13;
-         if ((active0 & 0x3a4aaL) != 0L)
+         if ((active0 & 0x3a4caL) != 0L)
          {
             jjmatchedKind = 40;
             jjmatchedPos = 4;
@@ -78,7 +80,7 @@ private static final int jjStopStringLiteralDfa_0(int pos, long active0){
          }
          return -1;
       case 5:
-         if ((active0 & 0x80a0L) != 0L)
+         if ((active0 & 0x80c0L) != 0L)
             return 13;
          if ((active0 & 0x3240aL) != 0L)
          {
@@ -178,9 +180,9 @@ static private int jjMoveStringLiteralDfa0_0(){
       case 98:
          return jjMoveStringLiteralDfa1_0(0x20000L);
       case 101:
-         return jjMoveStringLiteralDfa1_0(0x40L);
+         return jjMoveStringLiteralDfa1_0(0x20L);
       case 105:
-         return jjMoveStringLiteralDfa1_0(0x30L);
+         return jjMoveStringLiteralDfa1_0(0x50L);
       case 123:
          return jjStopAtPos(0, 18);
       case 124:
@@ -221,11 +223,11 @@ static private int jjMoveStringLiteralDfa1_0(long active0){
             jjmatchedKind = 4;
             jjmatchedPos = 1;
          }
-         return jjMoveStringLiteralDfa2_0(active0, 0x20L);
+         return jjMoveStringLiteralDfa2_0(active0, 0x40L);
       case 104:
          return jjMoveStringLiteralDfa2_0(active0, 0x100L);
       case 108:
-         return jjMoveStringLiteralDfa2_0(active0, 0x40L);
+         return jjMoveStringLiteralDfa2_0(active0, 0x20L);
       case 110:
          return jjMoveStringLiteralDfa2_0(active0, 0x8000L);
       case 111:
@@ -270,9 +272,9 @@ static private int jjMoveStringLiteralDfa2_0(long old0, long active0){
             return jjStartNfaWithStates_0(2, 9, 13);
          return jjMoveStringLiteralDfa3_0(active0, 0x2000L);
       case 115:
-         return jjMoveStringLiteralDfa3_0(active0, 0x840L);
+         return jjMoveStringLiteralDfa3_0(active0, 0x820L);
       case 116:
-         return jjMoveStringLiteralDfa3_0(active0, 0x8020L);
+         return jjMoveStringLiteralDfa3_0(active0, 0x8040L);
       default :
          break;
    }
@@ -295,11 +297,11 @@ static private int jjMoveStringLiteralDfa3_0(long old0, long active0){
       case 100:
          return jjMoveStringLiteralDfa4_0(active0, 0x2000L);
       case 101:
-         if ((active0 & 0x40L) != 0L)
-            return jjStartNfaWithStates_0(3, 6, 13);
+         if ((active0 & 0x20L) != 0L)
+            return jjStartNfaWithStates_0(3, 5, 13);
          return jjMoveStringLiteralDfa4_0(active0, 0x8000L);
       case 104:
-         return jjMoveStringLiteralDfa4_0(active0, 0x20L);
+         return jjMoveStringLiteralDfa4_0(active0, 0x40L);
       case 105:
          return jjMoveStringLiteralDfa4_0(active0, 0x10000L);
       case 108:
@@ -340,7 +342,7 @@ static private int jjMoveStringLiteralDfa4_0(long old0, long active0){
       case 101:
          if ((active0 & 0x100L) != 0L)
             return jjStartNfaWithStates_0(4, 8, 13);
-         return jjMoveStringLiteralDfa5_0(active0, 0x20020L);
+         return jjMoveStringLiteralDfa5_0(active0, 0x20040L);
       case 105:
          return jjMoveStringLiteralDfa5_0(active0, 0x8L);
       case 107:
@@ -387,8 +389,8 @@ static private int jjMoveStringLiteralDfa5_0(long old0, long active0){
       case 108:
          return jjMoveStringLiteralDfa6_0(active0, 0x400L);
       case 110:
-         if ((active0 & 0x20L) != 0L)
-            return jjStartNfaWithStates_0(5, 5, 13);
+         if ((active0 & 0x40L) != 0L)
+            return jjStartNfaWithStates_0(5, 6, 13);
          break;
       case 111:
          if ((active0 & 0x8000L) != 0L)
@@ -689,7 +691,7 @@ static private int jjMoveNfa_0(int startState, int curPos)
 /** Token literal values. */
 public static final String[] jjstrLiteralImages = {
 "", "\111\116\111\103\111\101\122", "\114\145\145\162", 
-"\105\163\143\162\151\142\151\162", "\151\146", "\151\146\164\150\145\156", "\145\154\163\145", 
+"\105\163\143\162\151\142\151\162", "\151\146", "\145\154\163\145", "\151\146\164\150\145\156", 
 "\123\167\151\164\143\150", "\127\150\151\154\145", "\106\157\162", "\104\145\146\141\165\154\164", 
 "\103\141\163\157", "\102\162\145\141\153", "\126\145\162\144\141\144\145\162\157", 
 "\106\141\154\163\157", "\105\156\164\145\162\157", "\104\145\143\151\155\141\154", 
@@ -826,7 +828,7 @@ static void SkipLexicalActions(Token matchedToken)
    {
       case 48 :
          image.append(input_stream.GetSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1)));
-        linkersTokenManager.tablaErrores.add("Error L\u00e9xico -> L\u00ednea: " + input_stream.getEndLine() + ", Columna: " + input_stream.getEndColumn() + ", Token no reconocido.");
+        linkers.tabla.add("Error L\u00e9xico -> L\u00ednea: " + input_stream.getEndLine() + ", Columna: " + input_stream.getEndColumn() + ", Token no reconocido.");
          break;
       default :
          break;

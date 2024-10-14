@@ -1,0 +1,7 @@
+Cuadruplas Generadas:
+(read, , , num1)
+(read, , , num2)
+(+, num1, num2, t0)
+(=, t0, , resultado)
+(write, , , "La suma es:")
+(write, , , resultado)

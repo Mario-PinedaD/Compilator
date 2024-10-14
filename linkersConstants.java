@@ -17,9 +17,9 @@ public interface linkersConstants {
   /** RegularExpression Id. */
   int CondicionalIf = 4;
   /** RegularExpression Id. */
-  int CondicionalIfthen = 5;
+  int CondicionalElse = 5;
   /** RegularExpression Id. */
-  int CondicionalElse = 6;
+  int CondicionalIfthen = 6;
   /** RegularExpression Id. */
   int CondicionalSwitch = 7;
   /** RegularExpression Id. */
@@ -107,8 +107,8 @@ public interface linkersConstants {
     "\"Leer\"",
     "\"Escribir\"",
     "\"if\"",
-    "\"ifthen\"",
     "\"else\"",
+    "\"ifthen\"",
     "\"Switch\"",
     "\"While\"",
     "\"For\"",
