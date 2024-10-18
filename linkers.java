@@ -601,7 +601,7 @@ linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
 }
 
-  static final public void condicionalSwitch() throws ParseException {
+  static final public void condicionalSwitch() throws ParseException {Token id;
     try {
       jj_consume_token(CondicionalSwitch);
       try {
