@@ -1,0 +1,13 @@
+INICIAR {
+
+    Entero a = 5;
+    Decimal b = 3.14 + 5.12 + 11.2;
+    boolean d = Verdadero;
+    
+
+    Leer (a);
+
+    Escribir("El valor de a es: " + a);
+    Escribir("El valor de b es: " + b);
+    Escribir("El valor de d es: " + d);
+}
