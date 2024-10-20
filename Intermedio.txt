@@ -1,0 +1,12 @@
+a = 5
+t0 = 3.14 + 5.12
+t1 = t0 + 11.2
+b = t1
+d = 1
+Leer a
+Escribir "El valor de a es: "
+Escribir a
+Escribir "El valor de b es: "
+Escribir b
+Escribir "El valor de d es: "
+Escribir d
