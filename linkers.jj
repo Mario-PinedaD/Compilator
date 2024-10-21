@@ -113,9 +113,9 @@ class linkers {
         public String toString() {
             if (this.operand2 != null) { // Es una operacion binaria
                 return this.result + " = " + this.operand1 + " " + this.operator + " " + this.operand2;
-            } else if (this.operand1 != null) {
+            } else if (this.operand1 != null) { // Es una asignacion
                 return this.result + " " + this.operator + " " + this.operand1;
-            } else {
+            } else { // Operaciones unarias
                 return this.operator + " " + this.result;
             }
         }
@@ -307,7 +307,7 @@ String verificarExistenciaYObtenerTipo(Token token) : {
 }
 
 void declararVariables() : {} {
-    VariableINT() | VariableFLOAT() | VariableBOOLEAN()
+    VariableINT() | VariableFLOAT() | VariableBOOLEAN() | VariableCADENA() | VariableCARACTER()
 }
 
 void VariableINT() : {
@@ -325,7 +325,10 @@ void VariableINT() : {
         [ <Asignacion> {
             ExpressionResult exprResult = expresion("int");
             // Generar TAC de asignación si hay inicialización
-            intermedia.add(new TAC("=", exprResult.place, id.image));
+            String temp = linkers.newTemp();
+            intermedia.add(new TAC("=", exprResult.place, temp));
+            intermedia.add(new TAC("=", temp, id.image));
+            // intermedia.add(new TAC("=", exprResult.place, id.image));
         } ]
         <DelimitadorLineaDeCodigo>
     } catch (ParseException e) {
@@ -352,7 +355,10 @@ void VariableFLOAT() : {
         [ <Asignacion> {
             ExpressionResult exprResult = expresion("float");
             // Generar tac de asignación si hay inicialización
-            intermedia.add(new TAC("=", exprResult.place, id.image));
+            String temp = linkers.newTemp();
+            intermedia.add(new TAC("=", exprResult.place, temp));
+            intermedia.add(new TAC("=", temp, id.image));
+            // intermedia.add(new TAC("=", exprResult.place, id.image));
         } ]
         <DelimitadorLineaDeCodigo>
     } catch (ParseException e) {
@@ -379,7 +385,10 @@ void VariableBOOLEAN() : {
         [ <Asignacion> {
             ExpressionResult exprResult = expresion("boolean");
             // Generar tac de asignación si hay inicialización
-            intermedia.add(new TAC("=", exprResult.place, id.image));
+            String temp = linkers.newTemp();
+            intermedia.add(new TAC("=", exprResult.place, temp));
+            intermedia.add(new TAC("=", temp, id.image));
+            // intermedia.add(new TAC("=", exprResult.place, id.image));
         } ]
         <DelimitadorLineaDeCodigo>
     } catch (ParseException e) {
@@ -406,7 +415,10 @@ void VariableCADENA() : {
         [ <Asignacion> {
             ExpressionResult exprResult = expresion("string");
             // Generar TAC de asignación si hay inicialización
-            intermedia.add(new TAC("=", exprResult.place, id.image));
+            String temp = linkers.newTemp();
+            intermedia.add(new TAC("=", exprResult.place, temp));
+            intermedia.add(new TAC("=", temp, id.image));
+            // intermedia.add(new TAC("=", exprResult.place, id.image));
         } ]
         <DelimitadorLineaDeCodigo>
     } catch (ParseException e) {
@@ -433,7 +445,10 @@ void VariableCARACTER() : {
         [ <Asignacion> {
             ExpressionResult exprResult = expresion("char");
             // Generar tac de asignación si hay inicialización
-            intermedia.add(new TAC("=", exprResult.place, id.image));
+            String temp = linkers.newTemp();
+            intermedia.add(new TAC("=", exprResult.place, temp));
+            intermedia.add(new TAC("=", temp, id.image));
+            // intermedia.add(new TAC("=", exprResult.place, id.image));
         } ]
         <DelimitadorLineaDeCodigo>
     } catch (ParseException e) {
@@ -466,7 +481,10 @@ void asignacion() : {
                 linkers.tabla.add("Error Semántico -> Tipo incorrecto en la operación. Se esperaba: " + varType + " pero se obtuvo: " + exprResult.type + " en línea " + id.beginLine + ", columna " + id.beginColumn);
             }
             // Generar TAC de asignación
-            intermedia.add(new TAC("=", exprResult.place, id.image));
+            String temp = linkers.newTemp();
+            intermedia.add(new TAC("=", exprResult.place, temp));
+            intermedia.add(new TAC("=", temp, id.image));
+            // intermedia.add(new TAC("=", exprResult.place, id.image));
         }
         <DelimitadorLineaDeCodigo>
     } catch (ParseException e) {
@@ -516,7 +534,7 @@ void entrada() : {} {
 }
 
 void salida() : {
-    boolean needTemp = false;
+    ExpressionResult res;
 } {
     try {
         <Escritura>
@@ -528,6 +546,7 @@ void salida() : {
 
         {
             Token token = getToken(1);
+
 
             // Si solamente es una cadena, se escribe el mensaje
             if (token.kind == linkersConstants.CADENA) {
@@ -545,26 +564,40 @@ void salida() : {
                 jj_consume_token(token.kind); // Consumir el token inesperado para continuar
             }
     
-            while (nextTokenIs(linkersConstants.OperacionSuma)) {
-                jj_consume_token(linkersConstants.OperacionSuma);
-                token = getToken(1);
+            // while (nextTokenIs(linkersConstants.OperacionSuma)) {
+            //     jj_consume_token(linkersConstants.OperacionSuma);
+            //     token = getToken(1);
 
-                if (token.kind == linkersConstants.CADENA) {
-                    jj_consume_token(linkersConstants.CADENA);
-                    // varCadena += token.image + " ";
-                    intermedia.add(new TAC("Escribir", token.image));
-                } else if (token.kind == linkersConstants.IDENTIFICADOR) {
-                    jj_consume_token(linkersConstants.IDENTIFICADOR);
-                    if (!linkers.declaredVariables.containsKey(token.image)) {
-                        linkers.tabla.add("Error Semántico en salida-> Variable no declarada: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
-                    }
-                    // varCadena += token.image + " ";
-                    intermedia.add(new TAC("Escribir", token.image));
-                } else {
-                    linkers.tabla.add("Error de Sintaxis -> Se esperaba una cadena o un identificador, pero se encontró: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
-                    jj_consume_token(token.kind); // Consumir el token inesperado para continuar
-                }
+            //     String temp = linkers.newTemp();
+            //     String temp_ant = temp;
+            //     if (token.kind == linkersConstants.CADENA) {
+            //         jj_consume_token(linkersConstants.CADENA);
+            //         intermedia.add(new TAC("=", "Escribir" + token.image, temp));
+            //     } else if (token.kind == linkersConstants.IDENTIFICADOR) {
+            //         jj_consume_token(linkersConstants.IDENTIFICADOR);
+            //         if (!linkers.declaredVariables.containsKey(token.image)) {
+            //             linkers.tabla.add("Error Semántico en salida-> Variable no declarada: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
+            //         }
+            //         intermedia.add(new TAC("+", token.image, temp));
+            //         intermedia.add(new TAC("EScribir", temp));
+            //     } else {
+            //         linkers.tabla.add("Error de Sintaxis -> Se esperaba una cadena o un identificador, pero se encontró: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
+            //         jj_consume_token(token.kind); // Consumir el token inesperado para continuar
+            //     }
+            // }
+            boolean cadena = true;
+            res = expresion("string");
+            while (nextTokenIsOperadorAritmetico(cadena)) {
+                // Generacion de codigo para la concatenaciones o sumas intermedias
+                String op = operadorAritmetico();
+                ExpressionResult right = expresion("string");
+                String temp = linkers.newTemp();
+                intermedia.add(new TAC(op, res.place, right.place, temp));
+                res = new ExpressionResult("string", temp);
             }
+
+            // Instruccion de salida
+            intermedia.add(new TAC("Escribir", res.place));
         }
         try {
             <ParentesisCierra>
@@ -902,7 +935,7 @@ ExpressionResult expresion(String expectedType) : {
     ExpressionResult left, right;
     String op;
 } {
-    left = termino(expectedType)
+    left = termino(expectedType) 
     (
         { if (nextTokenIsOperadorAritmetico()) {  // Verifica si hay un operador aritmético
             op = operadorAritmetico();
@@ -965,6 +998,14 @@ ExpressionResult factor(String expectedType) : {
             token = jj_consume_token(linkersConstants.FALSO);
             type = "boolean";
             place = "0";
+        } else if(nextTokenIs(linkersConstants.CADENA)) {
+            token = jj_consume_token(linkersConstants.CADENA);
+            type = "string";
+            place = token.image;
+        } else if (nextTokenIs(linkersConstants.LETRA)) {
+            token = jj_consume_token(linkersConstants.LETRA);
+            type = "character";
+            place = token.image;
         } else if (nextTokenIs(linkersConstants.IDENTIFICADOR)) {
             token = jj_consume_token(linkersConstants.IDENTIFICADOR);
             if (linkers.declaredVariables.containsKey(token.image)) {
@@ -1012,6 +1053,15 @@ boolean nextTokenIsOperadorAritmetico() : {
            t.kind == linkersConstants.OperacionResiduo;}
 }
 
+boolean nextTokenIsOperadorAritmetico(boolean concat) : {
+    Token t;
+} {
+    {t = getToken(1);
+    return t.kind == linkersConstants.OperacionSuma || t.kind == linkersConstants.OperacionResta || 
+           t.kind == linkersConstants.OperacionMultiplicacion || t.kind == linkersConstants.OperacionDivision ||
+           t.kind == linkersConstants.OperacionResiduo;}
+}
+
 ExpressionResult operacionParentesis(String expectedType) : {
     ExpressionResult res=null;
 } {
@@ -1051,6 +1101,14 @@ ExpressionResult valor(String expectedType) : {
             token = jj_consume_token(linkersConstants.FALSO);
             type = "boolean";
             place = "0";
+        } else if(nextTokenIs(linkersConstants.CADENA)) {
+            token = jj_consume_token(linkersConstants.CADENA);
+            type = "string";
+            place = token.image;
+        } else if (nextTokenIs(linkersConstants.LETRA)) {
+            token = jj_consume_token(linkersConstants.LETRA);
+            type = "character";
+            place = token.image;
         } else if (nextTokenIs(linkersConstants.IDENTIFICADOR)) {
             token = jj_consume_token(linkersConstants.IDENTIFICADOR);
             if (linkers.declaredVariables.containsKey(token.image)) {
@@ -1074,4 +1132,30 @@ ExpressionResult valor(String expectedType) : {
         throw e;
     }
     {return new ExpressionResult(type, place);}
+}
+
+boolean tiposCompatibles(String type1, String type2) : { 
+    boolean result = false;
+} {
+    {if (type1.equals("string") && (type2.equals("int") || type2.equals("float"))) {
+        result = true;
+    } else if ((type1.equals("int") || type1.equals("float")) && type2.equals("string")) {
+        result = true;
+    } else if (type2.equals("boolean") && type1.equals("string") || type1.equals("boolean") && type2.equals("string")) {
+        result = true;
+    } else if (type1.equals(type2)) {
+        result = true; // Tipos iguales son compatibles
+    }
+    return result;
+    }
+}
+
+ExpressionResult convertirACadena(ExpressionResult expr) : {} {
+    {if (!expr.type.equals("string")) {
+        // Se realiza una conversión implícita de tipos
+        String temp = linkers.newTemp();
+        intermedia.add(new TAC("toString", expr.place, temp));
+        expr = new ExpressionResult("string", temp);
+    }}
+    {return expr;}
 }
