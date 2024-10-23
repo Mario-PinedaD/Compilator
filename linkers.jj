@@ -939,10 +939,26 @@ ExpressionResult expresion(String expectedType) : {
     (
         { if (nextTokenIsOperadorAritmetico()) {  // Verifica si hay un operador aritmético
             op = operadorAritmetico();
-            right = termino(expectedType);
-            if (!left.type.equals(expectedType) || !right.type.equals(expectedType)) {
-                tabla.add("Error Semántico -> Tipo incorrecto en la operación. Se esperaba: " + expectedType + " pero se obtuvo: " + left.type + " y " + right.type);
+        right = termino(expectedType); // Procesamos el siguiente término
+
+        // Verificamos si la operación es válida según el tipo esperado
+        if (op.equals("+") && (left.type.equals("string") || right.type.equals("string"))) {
+            // Si es concatenación y alguno es cadena, convertimos ambos operandos a cadena
+            if (!left.type.equals("string")) {
+                String tempLeft = linkers.newTemp();
+                intermedia.add(new TAC("toString", left.place, tempLeft));
+                left = new ExpressionResult("string", tempLeft);
             }
+            if (!right.type.equals("string")) {
+                String tempRight = linkers.newTemp();
+                intermedia.add(new TAC("toString", right.place, tempRight));
+                right = new ExpressionResult("string", tempRight);
+            }
+        } 
+        else if (!left.type.equals(right.type)) {
+            // Si no son compatibles, generamos un error
+            tabla.add("Error Semántico -> Tipos incompatibles: " + left.type + " y " + right.type);
+        }
             String temp = linkers.newTemp();
             intermedia.add(new TAC(op, left.place, right.place, temp));
             left = new ExpressionResult(expectedType, temp);

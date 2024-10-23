@@ -1,12 +1,21 @@
 INICIAR {
-
-    Entero a;
-    Decimal b = 3.14;
+    Entero a = 5;
+    Entero b = 2;
+    Decimal c = 3.14;
     boolean d = Verdadero;
-
-    b = b + 5.12 + 11.2;
+    Entero g[2];
 
     Leer (a);
 
-    Escribir("El valor de a es: " + a);
+    Escribir("El valor de a" + a);
+    
+    if (a > 10) {
+        Escribir("a es mayor que 10");
+    } else {
+        Escribir("a no es mayor que 11");
+    }
+
+   While( c < 10.0){
+	Escribir("PRUEBA WHILE");
+   }
 }
