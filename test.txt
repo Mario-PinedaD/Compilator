@@ -18,4 +18,6 @@ INICIAR {
    While( c < 10.0){
 	Escribir("PRUEBA WHILE");
    }
+
+   
 }
