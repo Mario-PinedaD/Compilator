@@ -299,7 +299,8 @@ void sentencias() : {} {
     | cicloWhile()
     | condicionalSwitch()
     | llamadaFuncion()
-}
+} 
+
 
 void verificarExistenciaVariable(Token token) : {} {
     {
