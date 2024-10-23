@@ -37,73 +37,91 @@ public interface linkersConstants {
   /** RegularExpression Id. */
   int FALSO = 14;
   /** RegularExpression Id. */
-  int TipoDatoEntero = 15;
+  int PUBLICO = 15;
   /** RegularExpression Id. */
-  int TipoDatoDecimal = 16;
+  int PRIVADO = 16;
   /** RegularExpression Id. */
-  int TipoDatoBooleano = 17;
+  int NoRetorno = 17;
   /** RegularExpression Id. */
-  int TipoDatoCadena = 18;
+  int Start = 18;
   /** RegularExpression Id. */
-  int TIpoDatoCaracter = 19;
+  int End = 19;
   /** RegularExpression Id. */
-  int LlaveAbre = 20;
+  int Funcion = 20;
   /** RegularExpression Id. */
-  int LlaveCierra = 21;
+  int Retorno = 21;
   /** RegularExpression Id. */
-  int ParentesisAbre = 22;
+  int LlamarFuncion = 22;
   /** RegularExpression Id. */
-  int ParentesisCierra = 23;
+  int TipoDatoEntero = 23;
   /** RegularExpression Id. */
-  int DelimitadorLineaDeCodigo = 24;
+  int TipoDatoDecimal = 24;
   /** RegularExpression Id. */
-  int DelimitadorCasoSwitch = 25;
+  int TipoDatoBooleano = 25;
   /** RegularExpression Id. */
-  int CorcheteAbre = 26;
+  int TipoDatoCadena = 26;
   /** RegularExpression Id. */
-  int CorcheteCierra = 27;
+  int TIpoDatoCaracter = 27;
   /** RegularExpression Id. */
-  int OperacionSuma = 28;
+  int LlaveAbre = 28;
   /** RegularExpression Id. */
-  int OperacionResta = 29;
+  int LlaveCierra = 29;
   /** RegularExpression Id. */
-  int OperacionMultiplicacion = 30;
+  int ParentesisAbre = 30;
   /** RegularExpression Id. */
-  int OperacionDivision = 31;
+  int ParentesisCierra = 31;
   /** RegularExpression Id. */
-  int OperacionResiduo = 32;
+  int DelimitadorLineaDeCodigo = 32;
   /** RegularExpression Id. */
-  int Asignacion = 33;
+  int DelimitadorCasoSwitch = 33;
   /** RegularExpression Id. */
-  int OperacionMayorQue = 34;
+  int CorcheteAbre = 34;
   /** RegularExpression Id. */
-  int OperacionMenorQue = 35;
+  int CorcheteCierra = 35;
   /** RegularExpression Id. */
-  int OperacionMenorOIgualQue = 36;
+  int Coma = 36;
   /** RegularExpression Id. */
-  int OperacionMayorOIgualQue = 37;
+  int OperacionSuma = 37;
   /** RegularExpression Id. */
-  int OperacionIgualdad = 38;
+  int OperacionResta = 38;
   /** RegularExpression Id. */
-  int OperacionDesigualdad = 39;
+  int OperacionMultiplicacion = 39;
   /** RegularExpression Id. */
-  int OperacionAnd = 40;
+  int OperacionDivision = 40;
   /** RegularExpression Id. */
-  int OperacionOr = 41;
+  int OperacionResiduo = 41;
   /** RegularExpression Id. */
-  int OperacionNot = 42;
+  int Asignacion = 42;
   /** RegularExpression Id. */
-  int CADENA = 43;
+  int OperacionMayorQue = 43;
   /** RegularExpression Id. */
-  int IDENTIFICADOR = 44;
+  int OperacionMenorQue = 44;
   /** RegularExpression Id. */
-  int NUMERO_FLOTANTE = 45;
+  int OperacionMenorOIgualQue = 45;
   /** RegularExpression Id. */
-  int NUMERO = 46;
+  int OperacionMayorOIgualQue = 46;
   /** RegularExpression Id. */
-  int LETRA = 47;
+  int OperacionIgualdad = 47;
   /** RegularExpression Id. */
-  int ANYTHING = 52;
+  int OperacionDesigualdad = 48;
+  /** RegularExpression Id. */
+  int OperacionAnd = 49;
+  /** RegularExpression Id. */
+  int OperacionOr = 50;
+  /** RegularExpression Id. */
+  int OperacionNot = 51;
+  /** RegularExpression Id. */
+  int CADENA = 52;
+  /** RegularExpression Id. */
+  int IDENTIFICADOR = 53;
+  /** RegularExpression Id. */
+  int NUMERO_FLOTANTE = 54;
+  /** RegularExpression Id. */
+  int NUMERO = 55;
+  /** RegularExpression Id. */
+  int LETRA = 56;
+  /** RegularExpression Id. */
+  int ANYTHING = 61;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -125,6 +143,14 @@ public interface linkersConstants {
     "\"Break\"",
     "\"Verdadero\"",
     "\"Falso\"",
+    "\"Publico\"",
+    "\"Privado\"",
+    "\"NoRetorno\"",
+    "\"Start\"",
+    "\"End\"",
+    "\"Funcion\"",
+    "\"Retorno\"",
+    "\"call\"",
     "\"Entero\"",
     "\"Decimal\"",
     "\"boolean\"",
@@ -138,6 +164,7 @@ public interface linkersConstants {
     "\":\"",
     "\"[\"",
     "\"]\"",
+    "\",\"",
     "\"+\"",
     "\"-\"",
     "\"*\"",
