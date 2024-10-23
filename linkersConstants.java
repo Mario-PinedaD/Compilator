@@ -59,47 +59,51 @@ public interface linkersConstants {
   /** RegularExpression Id. */
   int DelimitadorCasoSwitch = 25;
   /** RegularExpression Id. */
-  int OperacionSuma = 26;
+  int CorcheteAbre = 26;
   /** RegularExpression Id. */
-  int OperacionResta = 27;
+  int CorcheteCierra = 27;
   /** RegularExpression Id. */
-  int OperacionMultiplicacion = 28;
+  int OperacionSuma = 28;
   /** RegularExpression Id. */
-  int OperacionDivision = 29;
+  int OperacionResta = 29;
   /** RegularExpression Id. */
-  int OperacionResiduo = 30;
+  int OperacionMultiplicacion = 30;
   /** RegularExpression Id. */
-  int Asignacion = 31;
+  int OperacionDivision = 31;
   /** RegularExpression Id. */
-  int OperacionMayorQue = 32;
+  int OperacionResiduo = 32;
   /** RegularExpression Id. */
-  int OperacionMenorQue = 33;
+  int Asignacion = 33;
   /** RegularExpression Id. */
-  int OperacionMenorOIgualQue = 34;
+  int OperacionMayorQue = 34;
   /** RegularExpression Id. */
-  int OperacionMayorOIgualQue = 35;
+  int OperacionMenorQue = 35;
   /** RegularExpression Id. */
-  int OperacionIgualdad = 36;
+  int OperacionMenorOIgualQue = 36;
   /** RegularExpression Id. */
-  int OperacionDesigualdad = 37;
+  int OperacionMayorOIgualQue = 37;
   /** RegularExpression Id. */
-  int OperacionAnd = 38;
+  int OperacionIgualdad = 38;
   /** RegularExpression Id. */
-  int OperacionOr = 39;
+  int OperacionDesigualdad = 39;
   /** RegularExpression Id. */
-  int OperacionNot = 40;
+  int OperacionAnd = 40;
   /** RegularExpression Id. */
-  int CADENA = 41;
+  int OperacionOr = 41;
   /** RegularExpression Id. */
-  int IDENTIFICADOR = 42;
+  int OperacionNot = 42;
   /** RegularExpression Id. */
-  int NUMERO_FLOTANTE = 43;
+  int CADENA = 43;
   /** RegularExpression Id. */
-  int NUMERO = 44;
+  int IDENTIFICADOR = 44;
   /** RegularExpression Id. */
-  int LETRA = 45;
+  int NUMERO_FLOTANTE = 45;
   /** RegularExpression Id. */
-  int ANYTHING = 51;
+  int NUMERO = 46;
+  /** RegularExpression Id. */
+  int LETRA = 47;
+  /** RegularExpression Id. */
+  int ANYTHING = 52;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -132,6 +136,8 @@ public interface linkersConstants {
     "\")\"",
     "\";\"",
     "\":\"",
+    "\"[\"",
+    "\"]\"",
     "\"+\"",
     "\"-\"",
     "\"*\"",
@@ -156,7 +162,6 @@ public interface linkersConstants {
     "\"\\r\"",
     "\"\\t\"",
     "\"\\n\"",
-    "\"//\"",
     "<ANYTHING>",
   };
 
