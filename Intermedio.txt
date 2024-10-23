@@ -1,11 +1,27 @@
-t0 = 3.14
-b = t0
-t1 = 1
-d = t1
-t2 = b + 5.12
-t3 = t2 + 11.2
-t4 = t3
-b = t4
+t0 = 5
+a = t0
+t1 = 2
+b = t1
+t2 = 3.14
+c = t2
+t3 = 1
+d = t3
+g reserva 2
 Leer a
-Escribir "El valor de a es: "
-Escribir 
+t4 = "El valor de a"
+t5 = t4 + a
+Escribir t5
+t6 = a > 10
+if t6 goto L0
+L0 :  ifFalse t6
+Escribir "a es mayor que 10"
+goto L1 : 
+label L0 : 
+Escribir "a no es mayor que 11"
+L1 :  
+label L2 : 
+t9 = c < 10.0
+L3 :  ifFalse t9
+Escribir "PRUEBA WHILE"
+goto L2 : 
+label L3 : 
