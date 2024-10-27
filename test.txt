@@ -4,14 +4,15 @@ INICIAR {
     Decimal c = 3.14;
     boolean d = Verdadero;
     Entero g[2];
-
+    a =  5 + 2 * 44 - 5;
     Leer (a);
 
     Escribir("El valor de a" + a);
+    Escribir("Esta es una prueba de escritura");
     
     if (a > 10) {
         Escribir("a es mayor que 10");
-    } else {
+    }else{
         Escribir("a no es mayor que 11");
     }
 
@@ -19,5 +20,13 @@ INICIAR {
 	Escribir("PRUEBA WHILE");
    }
 
+    Switch (a){
+        Caso 1:
+            Escribir(" ELDIAVLO 1 ");
+            Break;
+        Caso 2:
+            Escribir( "ELDIAVLO 2 ");
+            Break;
+    }
    
 }

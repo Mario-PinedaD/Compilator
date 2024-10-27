@@ -6,57 +6,47 @@ t2 = 3.14
 c = t2
 t3 = 1
 d = t3
+g reserva 2
+t4 = 5 + 2
+t5 = 44 - 5
+t6 = t4 * t5
+t7 = t6
+a = t7
 Leer a
-t4 = "El valor de a es: "
-t5 = t4 + a
-Escribir t5
-t6 = "El valor de b es: "
-t7 = t6 + b
-Escribir t7
-t8 = "El valor de c es: "
-t9 = t8 + c
-Escribir t9
-t10 = "El valor de d es: "
-t11 = t10 + d
-Escribir t11
-t12 = a > 10
-if t12 goto L0
-L0 :  ifFalse t12
-Escribir "a es mayor que 10"
-goto L1 : 
-label L0 : 
-Escribir "a no es mayor que 10"
-L1 :  
-label L2 : 
-goto L2 :  if Escribir == 1
-Escribir "Esta es una prueba del switch 1"
-label L3 : 
-goto L3 :  if Escribir == 2
-Escribir "Esta es una prueba del switch 2"
-label L4 : 
-Escribir "jiji"
-label L5 : 
-t18 = c < 10.0
-L6 :  ifFalse t18
-Escribir "PRUEBA WHILE"
-goto L5 : 
-label L6 : 
-label L7 : 
-t20 = a + 10
-t21 = t20
-z = t21
-t22 = "El valor de c es: "
-t23 = t22 + c
-Escribir t23
-t24 = "El valor de b es: "
-t25 = t24 + b
-Escribir t25
-goto L8 : 
- L8 : 
-label L9 : 
-t26 = a + b
-t27 = t26
-resultado = t27
-return resultado
-goto L10 : 
-label L10 : 
+t8 = "El valor de a"
+t9 = t8 + a
+ESCRIBIR t9
+ESCRIBIR "Esta es una prueba de escritura"
+
+ 
+t11 = a > 10
+if  t11 GOTO L0
+L0 :  ifFalse t11
+ESCRIBIR "a es mayor que 10"
+GOTO L1
+LABEL L0 : 
+ESCRIBIR "a no es mayor que 11"
+L1 
+
+ 
+LABEL L2 : 
+t14 = c < 10.0
+L3 :  ifFalse t14
+ESCRIBIR "PRUEBA WHILE"
+GOTO L2 : 
+LABEL L3 : 
+
+ 
+t16 = a
+GOTO L4
+LABEL L6:
+ESCRIBIR " ELDIAVLO 1 "
+GOTO L5 
+LABEL L7:
+ESCRIBIR "ELDIAVLO 2 "
+GOTO L5 
+L4 
+if Escribir == 1 GOTO L6 
+if Escribir == 2 GOTO L7 
+GOTO  L5
+L5 

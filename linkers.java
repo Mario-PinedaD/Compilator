@@ -17,6 +17,7 @@ class linkers implements linkersConstants {
     static ArrayList<TAC> intermedia = new ArrayList<TAC>();
     static int tempVarCounter = 0; // contador de variables temporales actuales
     static int labelCounter = 0; // contador de etiquetas actuales
+    static ArrayList<String> casos = new ArrayList<>();
 
     public static void main(String[] args) {
         try {
@@ -61,6 +62,8 @@ class linkers implements linkersConstants {
             declaredVariables.put(id.image, type);
         }
     }
+
+
 
     // Clase para el objeto de representacion intermedia
     static class TAC {
@@ -138,6 +141,10 @@ class linkers implements linkersConstants {
     // Método para generar el etiquetado
     static String newLabel() {
         return "L" + (labelCounter++) + " : ";
+    }
+
+    static String newLabelNoPoint(){
+        return "L" + (labelCounter++);
     }
 
     static class Parameter {
@@ -294,6 +301,13 @@ if (!linkers.declaredVariables.containsKey(token.image)) {
         }
 }
 
+/**
+ * Verifica la existencia de un token y obtiene su tipo.
+ *
+ * @param token El token que se va a verificar.
+ * @return El tipo del token si existe, de lo contrario, un valor que indique que no existe.
+ * @throws SomeException Si ocurre un error durante la verificación.
+ */
   static final public String verificarExistenciaYObtenerTipo(Token token) throws ParseException {String tipo;
 if (token.kind == linkersConstants.IDENTIFICADOR) {
             if (linkers.declaredVariables.containsKey(token.image)) {
@@ -349,6 +363,17 @@ if (token.kind == linkersConstants.IDENTIFICADOR) {
     }
 }
 
+/**
+ * Este método `VariableINT` se utiliza para definir una variable de tipo entero (INT).
+ * 
+ * Variables locales:
+ * - `Token id`: Representa el identificador del token.
+ * - `int line`: Almacena el número de línea donde se encuentra la variable.
+ * - `int column`: Almacena el número de columna donde se encuentra la variable.
+ * - `boolean control`: Bandera de control que inicialmente está establecida en falso.
+ * 
+ * Este método no tiene parámetros de entrada ni valores de retorno.
+ */
   static final public void VariableINT() throws ParseException {Token id;
     int line, column;
     boolean control = false;
@@ -408,6 +433,17 @@ Token t;
     }
 }
 
+/**
+ * * Inicializa un token para contener el identificador de la variable, y variables para almacenar los números
+ * de línea y columna donde se declara la variable. Además, incluye una variable de control booleana para
+  * procesamiento adicional.
+ * *
+ *  * Variables Locales:
+ * - Token id: Representa el token identificador para la variable de punto flotante.
+ * -  * - int line: Almacena el número de línea donde se declara la variable.
+ * - i * - int column: Almacena el número de columna donde se declara la variable.
+ * - in * - boolean control: Una bandera de control utilizada para procesamiento o validación adicional.
+ */
   static final public void VariableFLOAT() throws ParseException {Token id;
     int line, column;
     boolean control = false;
@@ -467,6 +503,18 @@ Token t;
     }
 }
 
+/**
+ * Método que maneja la declaración de variables de tipo BOOLEAN en el compilador.
+ * 
+ * Variables locales:
+ * - Token id: Representa el identificador del token.
+ * - int line: Almacena la línea del código fuente donde se encuentra la variable.
+ * - int column: Almacena la columna del código fuente donde se encuentra la variable.
+ * - boolean control: Bandera de control utilizada en el proceso de manejo de la variable.
+ * 
+ * Este método es parte del archivo de definiciones del compilador y se encarga de 
+ * procesar y validar las declaraciones de variables de tipo BOOLEAN en el código fuente.
+ */
   static final public void VariableBOOLEAN() throws ParseException {Token id;
     int line, column;
     boolean control = false;
@@ -644,6 +692,17 @@ Token t;
     }
 }
 
+/**
+ * Este método representa una regla de asignación en un compilador.
+ * 
+ * Variables locales:
+ * - `id`: Un token que representa el identificador de la variable a la que se le asignará un valor.
+ * - `varType`: Una cadena que almacena el tipo de la variable. Inicialmente está vacía.
+ * - `exprResult`: Un objeto de tipo `ExpressionResult` que almacena el resultado de la expresión que se asignará a la variable.
+ * 
+ * La implementación de este método debe definir cómo se realiza la asignación de valores a las variables,
+ * incluyendo la verificación de tipos y la evaluación de la expresión.
+ */
   static final public void asignacion() throws ParseException {Token id;
     String varType = "";
     ExpressionResult exprResult;
@@ -683,7 +742,18 @@ Token t;
       } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
-Token token = jj_consume_token(linkersConstants.IDENTIFICADOR);
+/**
+             * Este fragmento de código consume un token del analizador léxico (lexer) en un compilador.
+             * 
+             * - `jj_consume_token(linkersConstants.IDENTIFICADOR)`: Esta llamada al método `jj_consume_token` 
+             *   consume el siguiente token de la secuencia de entrada si coincide con el tipo de token 
+             *   especificado, en este caso `linkersConstants.IDENTIFICADOR`. 
+             *   Si el token no coincide, se lanzará una excepción de error de sintaxis.
+             * 
+             * - `Token token`: La variable `token` almacena el token consumido, que puede ser utilizado 
+             *   posteriormente en el análisis sintáctico o semántico.
+             */
+            Token token = jj_consume_token(linkersConstants.IDENTIFICADOR);
             if (!linkers.declaredVariables.containsKey(token.image)) {
                 linkers.tabla.add("Error Sem\u00e1ntico en entrada-> Variable no declarada: " + token.image + " en l\u00ednea " + token.beginLine + ", columna " + token.beginColumn);
             } else {
@@ -709,6 +779,17 @@ Token t;
     }
 }
 
+/**
+ * El método `salida` es un método que no recibe parámetros y devuelve un valor de tipo `void`.
+ * 
+ * Dentro del bloque de inicialización del método, se declaran dos variables locales:
+ * - `res` de tipo `ExpressionResult`.
+ * - `temporal` de tipo `TAC`, que se inicializa con una nueva instancia de `TAC`.
+ * 
+ * El método `salida` no tiene un cuerpo de implementación definido en el código proporcionado,
+ * lo que sugiere que podría estar incompleto o que su funcionalidad se define en otra parte.
+ * 
+ */
   static final public void salida() throws ParseException {ExpressionResult res;
     TAC temporal = new TAC();
     try {
@@ -726,13 +807,13 @@ Token token = getToken(1);
             if (token.kind == linkersConstants.CADENA) {
                 jj_consume_token(linkersConstants.CADENA);
                 temp = newTemp();
-                temporal = new TAC("Escribir", token.image);
+                temporal = new TAC("ESCRIBIR", token.image);
             } else if (token.kind == linkersConstants.IDENTIFICADOR) {
                 // Si es un identificador, verificamos que exista y obtenemos su tipo
                 String type = linkers.verificarExistenciaYObtenerTipo(token);
                 if (!type.equals("error")) {
                     temp = newTemp();
-                    temporal = new TAC("Escribir", token.image);
+                    temporal = new TAC("ESCRIBIR", token.image);
                 }
             } else {
                 tabla.add("Error Sem\u00e1ntico -> Tipo incorrecto en operaci\u00f3n de escritura. Se esperaba: Cadena o Identificador");
@@ -767,7 +848,7 @@ Token token = getToken(1);
             }
 
             if (isConcatenation) {
-                intermedia.add(new TAC("Escribir", temp2));
+                intermedia.add(new TAC("ESCRIBIR", temp2));
             } else {
                 intermedia.add(temporal);
             }
@@ -800,15 +881,17 @@ Token t;
       } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
-condResult = condicion();
-            intermedia.add(new TAC("if", "t" + (tempVarCounter - 1) + " goto" + " L" + labelCounter));
+//Salto de linea para poder verlo mejor c:
+            intermedia.add(new TAC("\n",""));
+            condResult = condicion();
+            intermedia.add(new TAC("if ", "t" + (tempVarCounter - 1) + " GOTO" + " L" + labelCounter));
       try {
         jj_consume_token(ParentesisCierra);
       } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
 condFalseLabel = linkers.newLabel();
-            endLabel = linkers.newLabel();
+            endLabel = linkers.newLabelNoPoint();
             // Generar salto condicional hacia else o fin
             intermedia.add(new TAC("ifFalse", condResult.place, condFalseLabel));
       try {
@@ -848,9 +931,9 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
 // Generar salto al fin después del bloque if
-            intermedia.add(new TAC("goto", endLabel));
+            intermedia.add(new TAC("GOTO", endLabel));
             // Etiqueta para el bloque else
-            intermedia.add(new TAC("label", condFalseLabel));
+            intermedia.add(new TAC("LABEL", condFalseLabel));
       condicionalElseBlock();
 // Etiqueta para el fin del bloque if-else
             intermedia.add(new TAC(endLabel, ""));
@@ -964,7 +1047,7 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
 // Añadir etiqueta para el fin del bloque ifthen
-            intermedia.add(new TAC("label", condFalseLabel));
+            intermedia.add(new TAC("LABEL", condFalseLabel));
     } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
@@ -998,7 +1081,8 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
         throw new ParseException();
       }
 startLabel = linkers.newLabel();
-            intermedia.add(new TAC("label", startLabel));
+            intermedia.add(new TAC("\n",""));
+            intermedia.add(new TAC("LABEL", startLabel));
 condResult = condicion();
 endLabel = linkers.newLabel();
             // Generar salto condicional
@@ -1008,7 +1092,11 @@ endLabel = linkers.newLabel();
       } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
-asignacion();
+{
+
+            }
+            asignacionLogica();
+
       try {
         jj_consume_token(ParentesisCierra);
       } catch (ParseException e) {
@@ -1046,9 +1134,9 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
         sentencias();
       }
 // Salto al inicio del ciclo
-            intermedia.add(new TAC("goto", startLabel));
+            intermedia.add(new TAC("GOTO", startLabel));
             // Etiqueta de fin del ciclo
-            intermedia.add(new TAC("label", endLabel));
+            intermedia.add(new TAC("LABEL", endLabel));
       try {
         jj_consume_token(LlaveCierra);
       } catch (ParseException e) {
@@ -1059,12 +1147,41 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
 }
 
+  static final public void asignacionLogica() throws ParseException {Token id, num;
+    String varType = "", oper;
+    ExpressionResult exprResult;
+    try {
+      id = jj_consume_token(IDENTIFICADOR);
+if (!linkers.declaredVariables.containsKey(id.image)) {
+                linkers.tabla.add("Error Sem\u00e1ntico -> Variable no declarada: " + id.image + " en l\u00ednea " + id.beginLine + ", columna " + id.beginColumn);
+            } else {
+                varType = linkers.declaredVariables.get(id.image);
+            }
+String tmp1 = linkers.newTemp();
+            intermedia.add(new TAC("=", "0", tmp1));
+            intermedia.add(new TAC("=", tmp1, id.image));
+      oper = operadorAritmetico();
+exprResult = expresion(varType);
+            if (!exprResult.type.equals(varType)) {
+                linkers.tabla.add("Error Sem\u00e1ntico -> Tipo incorrecto en la operaci\u00f3n. Se esperaba: " + varType + " pero se obtuvo: " + exprResult.type + " en l\u00ednea " + id.beginLine + ", columna " + id.beginColumn);
+            }
+            // Generar TAC de asignación
+            String temp = linkers.newTemp();
+      num = jj_consume_token(NUMERO);
+intermedia.add(new TAC("=", exprResult.place + num.image, temp));
+            intermedia.add(new TAC("=", temp, id.image));
+    } catch (ParseException e) {
+
+    }
+}
+
   static final public void cicloWhile() throws ParseException {String startLabel, endLabel;
     ExpressionResult condResult;
     try {
       jj_consume_token(CicloWhile);
-startLabel = linkers.newLabel();
-            intermedia.add(new TAC("label", startLabel));
+intermedia.add(new TAC("\n", ""));
+            startLabel = linkers.newLabel();
+            intermedia.add(new TAC("LABEL", startLabel));
       try {
         jj_consume_token(ParentesisAbre);
       } catch (ParseException e) {
@@ -1111,9 +1228,9 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
         sentencias();
       }
 // Salto al inicio del ciclo
-            intermedia.add(new TAC("goto", startLabel));
+            intermedia.add(new TAC("GOTO", startLabel));
             // Etiqueta de fin del ciclo
-            intermedia.add(new TAC("label", endLabel));
+            intermedia.add(new TAC("LABEL", endLabel));
       try {
         jj_consume_token(LlaveCierra);
       } catch (ParseException e) {
@@ -1130,6 +1247,12 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
       jj_consume_token(CondicionalSwitch);
       jj_consume_token(ParentesisAbre);
       id = jj_consume_token(IDENTIFICADOR);
+String tmp1 = linkers.newTemp();
+            String lb = linkers.newLabelNoPoint();
+            String lbFin = linkers.newLabelNoPoint();
+            intermedia.add(new TAC("\n", "")); //Salto de linea
+            intermedia.add(new TAC("=", id.image, tmp1));
+            intermedia.add(new TAC("GOTO", lb));
       jj_consume_token(ParentesisCierra);
       jj_consume_token(LlaveAbre);
 if (!linkers.declaredVariables.containsKey(id.image)) {
@@ -1146,8 +1269,14 @@ if (!linkers.declaredVariables.containsKey(id.image)) {
           jj_la1[21] = jj_gen;
           break label_9;
         }
-        caso();
+        caso(lbFin);
       }
+intermedia.add(new TAC(lb, ""));
+            for (String iterador : casos) {
+                intermedia.add(new TAC(iterador, ""));
+            }
+            intermedia.add(new TAC("GOTO ", lbFin));
+            intermedia.add(new TAC(lbFin, ""));
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case Default:{
         defaultCaso();
@@ -1167,14 +1296,17 @@ Token t;
     }
 }
 
-  static final public void caso() throws ParseException {Token caseValue, id;
+  static final public void caso(String labelFin) throws ParseException {Token caseValue, id;
     jj_consume_token(Caso);
     caseValue = jj_consume_token(NUMERO);
     jj_consume_token(DelimitadorCasoSwitch);
 id = getToken(1);
-        String label = linkers.newLabel();
-        intermedia.add(new TAC("label", label));
-        intermedia.add(new TAC("if", id.image + " == " + caseValue.image, "goto " + label));
+        String LABEL = linkers.newLabelNoPoint();
+        intermedia.add(new TAC("LABEL", LABEL+":"));
+        //intermedia.add(new TAC("if", id.image + " == " + caseValue.image, "GOTO " + LABEL));
+        casos.add("if " + id.image + " == " + caseValue.image + " GOTO " + LABEL);
+        //intermedia.add(new TAC(image.))
+
     label_10:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -1201,14 +1333,15 @@ id = getToken(1);
       }
       sentencias();
     }
+intermedia.add(new TAC("GOTO "+labelFin, ""));
     jj_consume_token(Break);
     jj_consume_token(DelimitadorLineaDeCodigo);
 }
 
-  static final public void defaultCaso() throws ParseException {String label = linkers.newLabel();
+  static final public void defaultCaso() throws ParseException {String LABEL = linkers.newLabel();
     jj_consume_token(Default);
     jj_consume_token(DelimitadorCasoSwitch);
-intermedia.add(new TAC("label", label));
+intermedia.add(new TAC("LABEL", LABEL));
     label_11:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -1249,7 +1382,7 @@ parameters = listaParametros();
       jj_consume_token(Start);
 startLabel = linkers.newLabel();
             endLabel = linkers.newLabel();
-            intermedia.add(new TAC("label", startLabel)); // Etiqueta de inicio del procedimiento
+            intermedia.add(new TAC("LABEL", startLabel)); // Etiqueta de inicio del procedimiento
             // Agregar los parámetros a la tabla de variables declaradas
             for (Parameter param : parameters) {
                 linkers.declaredVariables.put(param.name, param.type);
@@ -1280,7 +1413,7 @@ startLabel = linkers.newLabel();
           break label_12;
         }
       }
-intermedia.add(new TAC("goto", endLabel)); // Salto al final del procedimiento
+intermedia.add(new TAC("GOTO", endLabel)); // Salto al final del procedimiento
             intermedia.add(new TAC("", endLabel)); // Etiqueta de fin del procedimiento
 
       jj_consume_token(End);
@@ -1418,7 +1551,7 @@ parameters = listaParametros();
       jj_consume_token(Start);
 startLabel = linkers.newLabel();
             endLabel = linkers.newLabel();
-            intermedia.add(new TAC("label", startLabel)); // Etiqueta de inicio de la función
+            intermedia.add(new TAC("LABEL", startLabel)); // Etiqueta de inicio de la función
             // Agregar los parámetros a la tabla de variables declaradas
             for (Parameter param : parameters) {
                 linkers.declaredVariables.put(param.name, param.type);
@@ -1458,8 +1591,8 @@ startLabel = linkers.newLabel();
         jj_la1[32] = jj_gen;
         ;
       }
-intermedia.add(new TAC("goto", endLabel)); // Salto al final de la función
-            intermedia.add(new TAC("label", endLabel)); // Etiqueta de fin de la función
+intermedia.add(new TAC("GOTO", endLabel)); // Salto al final de la función
+            intermedia.add(new TAC("LABEL", endLabel)); // Etiqueta de fin de la función
 
       jj_consume_token(End);
     } catch (ParseException e) {
@@ -1499,11 +1632,11 @@ Token t;
       id = jj_consume_token(IDENTIFICADOR);
       jj_consume_token(ParentesisAbre);
 funcName = id.image;
-        if (!linkers.declaredVariables.containsKey(funcName)) {
-            linkers.tabla.add("Error Sem\u00e1ntico -> Funci\u00f3n no declarada: " + funcName + " en l\u00ednea " + id.beginLine + ", columna " + id.beginColumn);
-        } else {
-            returnType = linkers.declaredVariables.get(funcName);
-        }
+            if (!linkers.declaredVariables.containsKey(funcName)) {
+                linkers.tabla.add("Error Sem\u00e1ntico -> Funci\u00f3n no declarada: " + funcName + " en l\u00ednea " + id.beginLine + ", columna " + id.beginColumn);
+            } else {
+                returnType = linkers.declaredVariables.get(funcName);
+            }
       argumentos = listaArgumentos();
       jj_consume_token(ParentesisCierra);
 // Generar TAC para la llamada a la función
