@@ -849,21 +849,54 @@ void salida() : {
 
 void condicionalIf() : {
     String condFalseLabel;
-    String endLabel;
+    String endLabel, startLabel, lb;
     ExpressionResult condResult;
 } {
     try {
-        <CondicionalIf>
+        {
+            endLabel= linkers.newLabelNoPoint();
+            lb = linkers.newLabelNoPoint();
+            intermedia.add(new TAC("\n", ""));  //Salto de linea
+            if(!casos.isEmpty()){
+                casos.clear();
+            }
+        }
+        parteIf(lb, endLabel)
+
+        ( parteElseIf(endLabel) )*
+        
+        //[ parteElse(endLabel) ]
+        {  
+            //Esta parte es únicamente para generar el bloque de los IF
+            intermedia.add(new TAC(lb, ""));    //Nueva etiqueta temporal
+            for (String iterador : casos) {
+                intermedia.add(new TAC(iterador, ""));
+            }
+
+            intermedia.add(new TAC("GOTO ", endLabel));
+            intermedia.add(new TAC(endLabel, ":"));
+        }
+    } catch (ParseException e) {
+        tabla.add("Error de Sintaxis -> " + e.getMessage());
+    }
+}
+
+void parteIf(String previousLabel,String endLabel) : {
+    String startLabel;
+    ExpressionResult condResult;
+}
+{
+    <CondicionalIf>
         try {
             <ParentesisAbre>
         } catch (ParseException e) {
             tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
         { 
-            //Salto de linea para poder verlo mejor c:
-            intermedia.add(new TAC("\n",""));
+            startLabel = linkers.newLabelNoPoint();
             condResult = condicion();
-            intermedia.add(new TAC("if ", "t" + (tempVarCounter - 1) + " GOTO" + " L" + labelCounter));
+            intermedia.add(new TAC("GOTO ", previousLabel));
+
         }
         try {
             <ParentesisCierra>
@@ -872,38 +905,118 @@ void condicionalIf() : {
         }
 
         {
-            condFalseLabel = linkers.newLabel();
-            endLabel = linkers.newLabelNoPoint(); 
-            // Generar salto condicional hacia else o fin
-            intermedia.add(new TAC("ifFalse", condResult.place, condFalseLabel));
+            casos.add("IF " + condResult.place + " GOTO "+ startLabel);
+            //casos.add("GOTO " + endLabel);
         }
         try {
-            <LlaveAbre>
+            <LlaveAbre>{
+                intermedia.add(new TAC(startLabel,""));
+            }
         } catch (ParseException e) {
             tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
         (sentencias())*
         try {
+            <LlaveCierra>{
+                intermedia.add(new TAC("GOTO",endLabel));
+            }
+        } catch (ParseException e) {
+            tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
+}
+
+
+void parteElseIf(String endLabel) : {
+    String startLabel = "";
+    Token id;
+    String nuevaLabel="";
+    ExpressionResult condResult;
+}
+{
+    try{
+        <CondicionalElse>
+        {
+            id = getToken(1);
+            startLabel = linkers.newLabelNoPoint();
+            if(id.image != "if"){
+                intermedia.add (new TAC(startLabel+":", ""));
+            }
+            if(id.image == "{"){
+                casos.add("GOTO " + startLabel);
+            }
+        }
+        
+        [<CondicionalIf>
+        try {
+            <ParentesisAbre>
+        } catch (ParseException e) {
+            tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
+        condResult = condicion()
+
+        try {
+            <ParentesisCierra>
+        } catch (ParseException e) {
+            tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
+
+        {
+            intermedia.add(new TAC(nuevaLabel, ""));
+            casos.add("IF " + condResult.place + " GOTO " + startLabel);
+        }
+        ]
+        try {
+            <LlaveAbre>{
+                //intermedia.add(new TAC("LABEL", startLabel+":"));
+            }
+        } catch (ParseException e) {
+            tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
+        (sentencias())*{
+            intermedia.add(new TAC("GOTO",endLabel));
+        }
+        try {
             <LlaveCierra>
         } catch (ParseException e) {
             tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
-        {
-            // Generar salto al fin después del bloque if
-            intermedia.add(new TAC("GOTO", endLabel));
-            // Etiqueta para el bloque else
-            intermedia.add(new TAC("LABEL", condFalseLabel));
-        }
-        // Manejar opcionalmente el bloque else
-        (condicionalElseBlock())
-        {
-            // Etiqueta para el fin del bloque if-else
-            intermedia.add(new TAC(endLabel, ""));
-        }
-    } catch (ParseException e) {
+
+    }catch (ParseException e) {
         tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
 }
+
+void parteElse(String endLabel) : {
+    String startLabel = "";
+}
+{
+    try{
+        //try{
+            <CondicionalElse>
+        //}catch (ParseException e){
+        //    return;
+        //}
+
+        try {
+            <LlaveAbre>
+
+        } catch (ParseException e) {
+            tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
+        (sentencias())*
+        try {
+            <LlaveCierra>{
+                intermedia.add(new TAC("GOTO ", endLabel));
+            }
+        } catch (ParseException e) {
+            tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
+
+    }catch (ParseException e ){
+        tabla.add("Error de Sintaxis -> " + e.getMessage());
+    }
+}
+
 
 // Método auxiliar para manejar el bloque else opcional
 void condicionalElseBlock() : {} {
@@ -1138,6 +1251,9 @@ void condicionalSwitch() : {
         <ParentesisAbre>
         id = <IDENTIFICADOR>{
 
+            if (!casos.isEmpty()){
+                casos.clear();
+            }
             String tmp1 = linkers.newTemp();
             String lb = linkers.newLabelNoPoint();
             String lbFin = linkers.newLabelNoPoint();
