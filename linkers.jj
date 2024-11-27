@@ -21,6 +21,7 @@ class linkers {
     static ArrayList<TAC> intermedia = new ArrayList<TAC>();
     static int tempVarCounter = 0; // contador de variables temporales actuales
     static int labelCounter = 0; // contador de etiquetas actuales
+    static ArrayList<String> casos = new ArrayList<>();
 
     public static void main(String[] args) {
         try {
@@ -65,6 +66,8 @@ class linkers {
             declaredVariables.put(id.image, type);
         }
     }
+
+    
 
     // Clase para el objeto de representacion intermedia
     static class TAC {
@@ -142,6 +145,10 @@ class linkers {
     // Método para generar el etiquetado
     static String newLabel() {
         return "L" + (labelCounter++) + " : ";
+    }
+
+    static String newLabelNoPoint(){
+        return "L" + (labelCounter++);
     }
 
     static class Parameter {
@@ -299,7 +306,8 @@ void sentencias() : {} {
     | cicloWhile()
     | condicionalSwitch()
     | llamadaFuncion()
-}
+} 
+
 
 void verificarExistenciaVariable(Token token) : {} {
     {
@@ -774,13 +782,13 @@ void salida() : {
             if (token.kind == linkersConstants.CADENA) {
                 jj_consume_token(linkersConstants.CADENA);
                 temp = newTemp();
-                temporal = new TAC("Escribir", token.image);
+                temporal = new TAC("ESCRIBIR", token.image);
             } else if (token.kind == linkersConstants.IDENTIFICADOR) {
                 // Si es un identificador, verificamos que exista y obtenemos su tipo
                 String type = linkers.verificarExistenciaYObtenerTipo(token);
                 if (!type.equals("error")) {
                     temp = newTemp();
-                    temporal = new TAC("Escribir", token.image);
+                    temporal = new TAC("ESCRIBIR", token.image);
                 }
             } else {
                 tabla.add("Error Semántico -> Tipo incorrecto en operación de escritura. Se esperaba: Cadena o Identificador");
@@ -815,7 +823,7 @@ void salida() : {
             }   
 
             if (isConcatenation) {
-                intermedia.add(new TAC("Escribir", temp2));
+                intermedia.add(new TAC("ESCRIBIR", temp2));
             } else {
                 intermedia.add(temporal);
             }
@@ -841,19 +849,54 @@ void salida() : {
 
 void condicionalIf() : {
     String condFalseLabel;
-    String endLabel;
+    String endLabel, startLabel, lb;
     ExpressionResult condResult;
 } {
     try {
-        <CondicionalIf>
+        {
+            endLabel= linkers.newLabelNoPoint();
+            lb = linkers.newLabelNoPoint();
+            intermedia.add(new TAC("\n", ""));  //Salto de linea
+            if(!casos.isEmpty()){
+                casos.clear();
+            }
+        }
+        parteIf(lb, endLabel)
+
+        ( parteElseIf(endLabel) )*
+        
+        //[ parteElse(endLabel) ]
+        {  
+            //Esta parte es únicamente para generar el bloque de los IF
+            intermedia.add(new TAC(lb, ""));    //Nueva etiqueta temporal
+            for (String iterador : casos) {
+                intermedia.add(new TAC(iterador, ""));
+            }
+
+            intermedia.add(new TAC("GOTO ", endLabel));
+            intermedia.add(new TAC(endLabel, ":"));
+        }
+    } catch (ParseException e) {
+        tabla.add("Error de Sintaxis -> " + e.getMessage());
+    }
+}
+
+void parteIf(String previousLabel,String endLabel) : {
+    String startLabel;
+    ExpressionResult condResult;
+}
+{
+    <CondicionalIf>
         try {
             <ParentesisAbre>
         } catch (ParseException e) {
             tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
         { 
-            condResult = condicion(); 
-            intermedia.add(new TAC("if", "t" + (tempVarCounter - 1) + " goto" + " L" + labelCounter));
+            startLabel = linkers.newLabelNoPoint();
+            condResult = condicion();
+            intermedia.add(new TAC("GOTO ", previousLabel));
+
         }
         try {
             <ParentesisCierra>
@@ -862,38 +905,118 @@ void condicionalIf() : {
         }
 
         {
-            condFalseLabel = linkers.newLabel();
-            endLabel = linkers.newLabel(); 
-            // Generar salto condicional hacia else o fin
-            intermedia.add(new TAC("ifFalse", condResult.place, condFalseLabel));
+            casos.add("IF " + condResult.place + " GOTO "+ startLabel);
+            //casos.add("GOTO " + endLabel);
         }
         try {
-            <LlaveAbre>
+            <LlaveAbre>{
+                intermedia.add(new TAC(startLabel,""));
+            }
         } catch (ParseException e) {
             tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
         (sentencias())*
         try {
+            <LlaveCierra>{
+                intermedia.add(new TAC("GOTO",endLabel));
+            }
+        } catch (ParseException e) {
+            tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
+}
+
+
+void parteElseIf(String endLabel) : {
+    String startLabel = "";
+    Token id;
+    String nuevaLabel="";
+    ExpressionResult condResult;
+}
+{
+    try{
+        <CondicionalElse>
+        {
+            id = getToken(1);
+            startLabel = linkers.newLabelNoPoint();
+            if(id.image != "if"){
+                intermedia.add (new TAC(startLabel+":", ""));
+            }
+            if(id.image == "{"){
+                casos.add("GOTO " + startLabel);
+            }
+        }
+        
+        [<CondicionalIf>
+        try {
+            <ParentesisAbre>
+        } catch (ParseException e) {
+            tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
+        condResult = condicion()
+
+        try {
+            <ParentesisCierra>
+        } catch (ParseException e) {
+            tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
+
+        {
+            intermedia.add(new TAC(nuevaLabel, ""));
+            casos.add("IF " + condResult.place + " GOTO " + startLabel);
+        }
+        ]
+        try {
+            <LlaveAbre>{
+                //intermedia.add(new TAC("LABEL", startLabel+":"));
+            }
+        } catch (ParseException e) {
+            tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
+        (sentencias())*{
+            intermedia.add(new TAC("GOTO",endLabel));
+        }
+        try {
             <LlaveCierra>
         } catch (ParseException e) {
             tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
-        {
-            // Generar salto al fin después del bloque if
-            intermedia.add(new TAC("goto", endLabel));
-            // Etiqueta para el bloque else
-            intermedia.add(new TAC("label", condFalseLabel));
-        }
-        // Manejar opcionalmente el bloque else
-        (condicionalElseBlock())
-        {
-            // Etiqueta para el fin del bloque if-else
-            intermedia.add(new TAC(endLabel, ""));
-        }
-    } catch (ParseException e) {
+
+    }catch (ParseException e) {
         tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
 }
+
+void parteElse(String endLabel) : {
+    String startLabel = "";
+}
+{
+    try{
+        //try{
+            <CondicionalElse>
+        //}catch (ParseException e){
+        //    return;
+        //}
+
+        try {
+            <LlaveAbre>
+
+        } catch (ParseException e) {
+            tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
+        (sentencias())*
+        try {
+            <LlaveCierra>{
+                intermedia.add(new TAC("GOTO ", endLabel));
+            }
+        } catch (ParseException e) {
+            tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
+
+    }catch (ParseException e ){
+        tabla.add("Error de Sintaxis -> " + e.getMessage());
+    }
+}
+
 
 // Método auxiliar para manejar el bloque else opcional
 void condicionalElseBlock() : {} {
@@ -959,7 +1082,7 @@ void condicionalIfthen() : {
         }
         {
             // Añadir etiqueta para el fin del bloque ifthen
-            intermedia.add(new TAC("label", condFalseLabel));
+            intermedia.add(new TAC("LABEL", condFalseLabel));
         }
     } catch (ParseException e) {
         tabla.add("Error de Sintaxis -> " + e.getMessage());
@@ -983,7 +1106,8 @@ void cicloFor() : {
         (declararVariables() | asignacion())
         {
             startLabel = linkers.newLabel();
-            intermedia.add(new TAC("label", startLabel));
+            intermedia.add(new TAC("\n",""));
+            intermedia.add(new TAC("LABEL", startLabel));
         }
         { condResult = condicion(); }
         {
@@ -997,7 +1121,13 @@ void cicloFor() : {
             tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
 
-        { asignacion(); }
+        //{ asignacion(); }
+        {  
+            {
+                
+            }
+            asignacionLogica(); 
+        }{}
         try {
             <ParentesisCierra>
         } catch (ParseException e) {
@@ -1012,9 +1142,9 @@ void cicloFor() : {
         (sentencias())*
         {
             // Salto al inicio del ciclo
-            intermedia.add(new TAC("goto", startLabel));
+            intermedia.add(new TAC("GOTO", startLabel));
             // Etiqueta de fin del ciclo
-            intermedia.add(new TAC("label", endLabel));
+            intermedia.add(new TAC("LABEL", endLabel));
         }
         try {
             <LlaveCierra>
@@ -1026,6 +1156,43 @@ void cicloFor() : {
     }
 }
 
+void asignacionLogica() : {
+    Token id, num;
+    String varType = "", oper;
+    ExpressionResult exprResult;
+} {
+    try {
+        id = <IDENTIFICADOR>
+        {
+            if (!linkers.declaredVariables.containsKey(id.image)) {
+                linkers.tabla.add("Error Semántico -> Variable no declarada: " + id.image + " en línea " + id.beginLine + ", columna " + id.beginColumn);
+            } else {
+                varType = linkers.declaredVariables.get(id.image);
+            }
+        }{
+            String tmp1 = linkers.newTemp();
+            intermedia.add(new TAC("=", "0", tmp1));
+            intermedia.add(new TAC("=", tmp1, id.image));
+        }
+         oper = operadorAritmetico()
+        {
+            exprResult = expresion(varType);
+            if (!exprResult.type.equals(varType)) {
+                linkers.tabla.add("Error Semántico -> Tipo incorrecto en la operación. Se esperaba: " + varType + " pero se obtuvo: " + exprResult.type + " en línea " + id.beginLine + ", columna " + id.beginColumn);
+            }
+            // Generar TAC de asignación
+            String temp = linkers.newTemp();
+        }
+        num = <NUMERO> {
+            
+            intermedia.add(new TAC("=", exprResult.place + num.image, temp));
+            intermedia.add(new TAC("=", temp, id.image));
+        }
+    } catch (ParseException e) {
+        //
+    }
+}
+
 void cicloWhile() : {
     String startLabel, endLabel;
     ExpressionResult condResult;
@@ -1033,8 +1200,9 @@ void cicloWhile() : {
     try {
         <CicloWhile>
         {
+            intermedia.add(new TAC("\n", ""));
             startLabel = linkers.newLabel();
-            intermedia.add(new TAC("label", startLabel));
+            intermedia.add(new TAC("LABEL", startLabel));
         }
         try {
             <ParentesisAbre>
@@ -1060,9 +1228,9 @@ void cicloWhile() : {
         (sentencias())*
         {
             // Salto al inicio del ciclo
-            intermedia.add(new TAC("goto", startLabel));
+            intermedia.add(new TAC("GOTO", startLabel));
             // Etiqueta de fin del ciclo
-            intermedia.add(new TAC("label", endLabel));
+            intermedia.add(new TAC("LABEL", endLabel));
         }
         try {
             <LlaveCierra>
@@ -1081,17 +1249,36 @@ void condicionalSwitch() : {
     try {
         <CondicionalSwitch>
         <ParentesisAbre>
-        id = <IDENTIFICADOR>
+        id = <IDENTIFICADOR>{
+
+            if (!casos.isEmpty()){
+                casos.clear();
+            }
+            String tmp1 = linkers.newTemp();
+            String lb = linkers.newLabelNoPoint();
+            String lbFin = linkers.newLabelNoPoint();
+            intermedia.add(new TAC("\n", "")); //Salto de linea
+            intermedia.add(new TAC("=", id.image, tmp1));
+            intermedia.add(new TAC("GOTO", lb));
+        }
         <ParentesisCierra>
         <LlaveAbre>
         {
             if (!linkers.declaredVariables.containsKey(id.image)) {
                 linkers.tabla.add("Error Semántico -> Variable no declarada: " + id.image + " en línea " + id.beginLine + ", columna " + id.beginColumn);
             }
-        }
+        } 
+          
         (
-            caso()
-        )*
+            caso(lbFin)
+        )*{
+            intermedia.add(new TAC(lb, ""));
+            for (String iterador : casos) {
+                intermedia.add(new TAC(iterador, ""));
+            }
+            intermedia.add(new TAC("GOTO ", lbFin));
+            intermedia.add(new TAC(lbFin, ""));
+        }
         (
             defaultCaso()
         )?
@@ -1105,7 +1292,7 @@ void condicionalSwitch() : {
     }
 }
 
-void caso() : {
+void caso( String labelFin) : {
     Token caseValue, id;
 } {
     <Caso>
@@ -1113,24 +1300,28 @@ void caso() : {
     <DelimitadorCasoSwitch>
     {
         id = getToken(1);
-        String label = linkers.newLabel();
-        intermedia.add(new TAC("label", label));
-        intermedia.add(new TAC("if", id.image + " == " + caseValue.image, "goto " + label));
+        String LABEL = linkers.newLabelNoPoint();
+        intermedia.add(new TAC("LABEL", LABEL+":"));
+        //intermedia.add(new TAC("if", id.image + " == " + caseValue.image, "GOTO " + LABEL));
+        casos.add("if " + id.image + " == " + caseValue.image + " GOTO " + LABEL);
+        //intermedia.add(new TAC(image.))
     }
     (
         sentencias()
-    )*
+    )*{
+        intermedia.add(new TAC("GOTO "+labelFin, ""));
+    }
     <Break>
     <DelimitadorLineaDeCodigo>
 }
 
 void defaultCaso() : {
-    String label = linkers.newLabel();
+    String LABEL = linkers.newLabel();
 } {
     <Default>
     <DelimitadorCasoSwitch>
     {
-        intermedia.add(new TAC("label", label));
+        intermedia.add(new TAC("LABEL", LABEL));
     }
     (
         sentencias()
@@ -1155,7 +1346,7 @@ void procedimiento() : {
         {
             startLabel = linkers.newLabel();
             endLabel = linkers.newLabel();
-            intermedia.add(new TAC("label", startLabel)); // Etiqueta de inicio del procedimiento
+            intermedia.add(new TAC("LABEL", startLabel)); // Etiqueta de inicio del procedimiento
             // Agregar los parámetros a la tabla de variables declaradas
             for (Parameter param : parameters) {
                 linkers.declaredVariables.put(param.name, param.type);
@@ -1163,7 +1354,7 @@ void procedimiento() : {
         }
         (sentencias())+
         {
-            intermedia.add(new TAC("goto", endLabel)); // Salto al final del procedimiento
+            intermedia.add(new TAC("GOTO", endLabel)); // Salto al final del procedimiento
             intermedia.add(new TAC("", endLabel)); // Etiqueta de fin del procedimiento
         }
         <End>
@@ -1236,7 +1427,7 @@ void funcion() : {
         {
             startLabel = linkers.newLabel();
             endLabel = linkers.newLabel();
-            intermedia.add(new TAC("label", startLabel)); // Etiqueta de inicio de la función
+            intermedia.add(new TAC("LABEL", startLabel)); // Etiqueta de inicio de la función
             // Agregar los parámetros a la tabla de variables declaradas
             for (Parameter param : parameters) {
                 linkers.declaredVariables.put(param.name, param.type);
@@ -1245,8 +1436,8 @@ void funcion() : {
         (sentencias())*
         (retorno(returnType))?
         {
-            intermedia.add(new TAC("goto", endLabel)); // Salto al final de la función
-            intermedia.add(new TAC("label", endLabel)); // Etiqueta de fin de la función
+            intermedia.add(new TAC("GOTO", endLabel)); // Salto al final de la función
+            intermedia.add(new TAC("LABEL", endLabel)); // Etiqueta de fin de la función
         }
         <End>
     } catch (ParseException e) {
