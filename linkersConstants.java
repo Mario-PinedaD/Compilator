@@ -91,37 +91,45 @@ public interface linkersConstants {
   /** RegularExpression Id. */
   int OperacionResiduo = 41;
   /** RegularExpression Id. */
-  int Asignacion = 42;
+  int OperacionIncremento = 42;
   /** RegularExpression Id. */
-  int OperacionMayorQue = 43;
+  int OperacionDecremento = 43;
   /** RegularExpression Id. */
-  int OperacionMenorQue = 44;
+  int OperadorIncremento = 44;
   /** RegularExpression Id. */
-  int OperacionMenorOIgualQue = 45;
+  int OperadorDecremento = 45;
   /** RegularExpression Id. */
-  int OperacionMayorOIgualQue = 46;
+  int Asignacion = 46;
   /** RegularExpression Id. */
-  int OperacionIgualdad = 47;
+  int OperacionMayorQue = 47;
   /** RegularExpression Id. */
-  int OperacionDesigualdad = 48;
+  int OperacionMenorQue = 48;
   /** RegularExpression Id. */
-  int OperacionAnd = 49;
+  int OperacionMenorOIgualQue = 49;
   /** RegularExpression Id. */
-  int OperacionOr = 50;
+  int OperacionMayorOIgualQue = 50;
   /** RegularExpression Id. */
-  int OperacionNot = 51;
+  int OperacionIgualdad = 51;
   /** RegularExpression Id. */
-  int CADENA = 52;
+  int OperacionDesigualdad = 52;
   /** RegularExpression Id. */
-  int IDENTIFICADOR = 53;
+  int OperacionAnd = 53;
   /** RegularExpression Id. */
-  int NUMERO_FLOTANTE = 54;
+  int OperacionOr = 54;
   /** RegularExpression Id. */
-  int NUMERO = 55;
+  int OperacionNot = 55;
   /** RegularExpression Id. */
-  int LETRA = 56;
+  int CADENA = 56;
   /** RegularExpression Id. */
-  int ANYTHING = 63;
+  int IDENTIFICADOR = 57;
+  /** RegularExpression Id. */
+  int NUMERO_FLOTANTE = 58;
+  /** RegularExpression Id. */
+  int NUMERO = 59;
+  /** RegularExpression Id. */
+  int LETRA = 60;
+  /** RegularExpression Id. */
+  int ANYTHING = 67;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -170,6 +178,10 @@ public interface linkersConstants {
     "\"*\"",
     "\"/\"",
     "\"%\"",
+    "\"+=\"",
+    "\"-=\"",
+    "\"++\"",
+    "\"--\"",
     "\"=\"",
     "\">\"",
     "\"<\"",
@@ -189,8 +201,8 @@ public interface linkersConstants {
     "\"\\t\"",
     "\"\\r\"",
     "\"\\n\"",
-    "<token of kind 61>",
-    "<token of kind 62>",
+    "<token of kind 65>",
+    "<token of kind 66>",
     "<ANYTHING>",
   };
 
