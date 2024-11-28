@@ -23,7 +23,8 @@ class linkers {
     static ArrayList<String> casos = new ArrayList<>();
 
     public static void main(String[] args) throws FileNotFoundException {
-        generador = new CodigoCPP("~/Documents/Automatas/Compilator/", "conversion");
+        String archivo = "codigo_objeto";
+        generador = new CodigoCPP("./", archivo);
 
         try {
             linkers link = new linkers(System.in);
@@ -37,6 +38,7 @@ class linkers {
             } else {
                 System.out.println("\u001B[32mAnálisis exitoso\u001B[0m");
                 System.out.print(acumulador_cpp);
+                compilarEjecutable("./" + archivo + ".cpp");
             }
 
         } catch (ParseException e) {
@@ -52,12 +54,55 @@ class linkers {
         }
     }
     
-
     static String obtenerNombreArchivo(File archivo) {
         String nombre = archivo.getName();
         int pos = nombre.lastIndexOf(".");
         return pos > 0 ? nombre.substring(0, pos) : nombre;
     }
+
+    static void compilarEjecutable(String sourcePath) {
+        String output = sourcePath.replace(".cpp", " ");
+        ProcessBuilder pb = new ProcessBuilder("g++", sourcePath, "-o", output);
+        try {
+            Process proceso = pb.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(proceso.getErrorStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            while ((line = errorReader.readLine()) !=  null) {
+                System.err.println(line);
+            }
+            int exitCode = proceso.waitFor();
+            System.out.println("GCC terminó con el código de salida: " + exitCode);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // static void ejecutarCompilado(String file) {
+    //     ProcessBuilder pb = new ProcessBuilder(file);
+    //     try {
+    //         Process proceso = pb.start();
+    //         BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
+    //         BufferedReader errorReader = new BufferedReader(new InputStreamReader(proceso.getErrorStream()));
+    //         String line;
+    //         while ((line = reader.readLine()) != null) {
+    //             System.out.println(line);
+    //         }
+    //         while ((line = errorReader.readLine()) !=  null) {
+    //             System.err.println(line);
+    //         }
+    //         int exitCode = proceso.waitFor();
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     } catch (InterruptedException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
     static class CodigoCPP {
         private File file;
@@ -69,8 +114,8 @@ class linkers {
                 "#include <iostream>\n" +
                 // "#include <Windows.h>\n" +
                 "using namespace std;\n" +
-                "int main() {\n" +
-                "\tSetConsoleOutputCP(CP_UTF8);\n"
+                "int main() {\n" 
+                // "\tSetConsoleOutputCP(CP_UTF8);\n"
             );
         }
 
@@ -684,7 +729,7 @@ void asignacion() : {
                 linkers.tabla.add("Error Semántico -> Tipo incorrecto en la operación. Se esperaba: " + varType + " pero se obtuvo: " + expr + " en línea " + id.beginLine + ", columna " + id.beginColumn);
             }
         }
-        
+
 
         <DelimitadorLineaDeCodigo>
         {
