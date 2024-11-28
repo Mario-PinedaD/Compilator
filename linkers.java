@@ -19,7 +19,8 @@ class linkers implements linkersConstants {
     static ArrayList<String> casos = new ArrayList<>();
 
     public static void main(String[] args) throws FileNotFoundException {
-        generador = new CodigoCPP("~/Documents/Automatas/Compilator/", "conversion");
+        String archivo = "codigo_objeto";
+        generador = new CodigoCPP("./", archivo);
 
         try {
             linkers link = new linkers(System.in);
@@ -32,7 +33,8 @@ class linkers implements linkersConstants {
                 }
             } else {
                 System.out.println("\u001b[32mAn\u00e1lisis exitoso\u001b[0m");
-                System.out.print(acumulador_cpp);
+                // System.out.print(acumulador_cpp);
+                compilarEjecutable("./" + archivo + ".cpp");
             }
 
         } catch (ParseException e) {
@@ -48,12 +50,55 @@ class linkers implements linkersConstants {
         }
     }
 
-
     static String obtenerNombreArchivo(File archivo) {
         String nombre = archivo.getName();
         int pos = nombre.lastIndexOf(".");
         return pos > 0 ? nombre.substring(0, pos) : nombre;
     }
+
+    static void compilarEjecutable(String sourcePath) {
+        String output = sourcePath.replace(".cpp", " ");
+        ProcessBuilder pb = new ProcessBuilder("g++", sourcePath, "-o", output);
+        try {
+            Process proceso = pb.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(proceso.getErrorStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            while ((line = errorReader.readLine()) !=  null) {
+                System.err.println(line);
+            }
+            int exitCode = proceso.waitFor();
+            System.out.println("GCC termin\u00f3 con el c\u00f3digo de salida: " + exitCode);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // static void ejecutarCompilado(String file) {
+    //     ProcessBuilder pb = new ProcessBuilder(file);
+    //     try {
+    //         Process proceso = pb.start();
+    //         BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
+    //         BufferedReader errorReader = new BufferedReader(new InputStreamReader(proceso.getErrorStream()));
+    //         String line;
+    //         while ((line = reader.readLine()) != null) {
+    //             System.out.println(line);
+    //         }
+    //         while ((line = errorReader.readLine()) !=  null) {
+    //             System.err.println(line);
+    //         }
+    //         int exitCode = proceso.waitFor();
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     } catch (InterruptedException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
     static class CodigoCPP {
         private File file;
@@ -65,8 +110,8 @@ class linkers implements linkersConstants {
                 "#include <iostream>\n" +
                 // "#include <Windows.h>\n" +
                 "using namespace std;\n" +
-                "int main() {\n" +
-                "\tSetConsoleOutputCP(CP_UTF8);\n"
+                "int main() {\n"
+                // "\tSetConsoleOutputCP(CP_UTF8);\n"
             );
         }
 
@@ -647,28 +692,34 @@ Token t;
  */
   static final public void asignacion() throws ParseException {Token id;
     String varType = "";
-    String expr;
+    String expr = "";
     try {
       id = jj_consume_token(IDENTIFICADOR);
-if (!linkers.declaredVariables.containsKey(id.image)) {
+// Verificar que la variable esté declarada
+            if (!linkers.declaredVariables.containsKey(id.image)) {
                 linkers.tabla.add("Error Sem\u00e1ntico -> Variable no declarada: " + id.image + " en l\u00ednea " + id.beginLine + ", columna " + id.beginColumn);
             } else {
                 varType = linkers.declaredVariables.get(id.image);
             }
       jj_consume_token(Asignacion);
-expr = expresion(varType);
-            if (!expr.equals(varType)) {
-                linkers.tabla.add("Error Sem\u00e1ntico -> Tipo incorrecto en la operaci\u00f3n. Se esperaba: " + varType + " pero se obtuvo: " + expr + " en l\u00ednea " + id.beginLine + ", columna " + id.beginColumn);
-            }
+// Generar la expresión
+            expr = expresion(varType);
+
+            // // Validar que el tipo de la expresión sea compatible
+            // if (!verificarCompatibilidadTipos(varType, expr)) {
+            //     linkers.tabla.add("Error Semántico -> Tipo incompatible en la asignación. Se esperaba: " + varType + " pero se obtuvo algo diferente en línea " + id.beginLine + ", columna " + id.beginColumn);
+            // }
+
       jj_consume_token(DelimitadorLineaDeCodigo);
-String codigo_temporal = id.image + " = " + expr + "; \n";
-            acumulador_cpp += codigo_temporal;
+// Agregar la traducción al acumulador
+            String codigo_temporal = id.image + " = " + expr + ";\n";
+            acumulador_cpp += "\t" + codigo_temporal;
     } catch (ParseException e) {
 Token t;
         do {
             t = getNextToken();
         } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
-        tabla.add("Error de Sintaxis -> " + e.getMessage());
+        linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
 }
 
@@ -1498,7 +1549,7 @@ opStr = "%";
 
   static final public String expresion(String expectedType) throws ParseException {String type = expectedType;
     String expr = "";
-expr = termino(expectedType);
+    expr = termino(expectedType);
     label_13:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -1525,7 +1576,8 @@ Token op = token;
 
   static final public String termino(String expectedType) throws ParseException {String type = expectedType;
     String term = "";
-term = factor(expectedType);
+    String factorType;
+    term = factor(expectedType);
     label_14:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -1668,6 +1720,43 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
     throw new Error("Missing return statement in function");
 }
 
+  static final public boolean esTipoCompatible(String tipo1, String tipo2) throws ParseException {
+{if ("" != null) return (tipo1.equals("int") && tipo2.equals("int")) ||
+             (tipo1.equals("float") && (tipo2.equals("int") || tipo2.equals("float"))) ||
+             (tipo1.equals("int") && tipo2.equals("float"));}
+    throw new Error("Missing return statement in function");
+}
+
+  static final public String actualizarTipoResultante(String tipo1, String tipo2) throws ParseException {String tipo;
+if (tipo1.equals("float") || tipo2.equals("float")) {
+        tipo = "float";
+    } else if (tipo1.equals("int") && tipo2.equals("int")) {
+        tipo ="int";
+    } else {
+        tipo = "error";
+    }
+{if ("" != null) return tipo;}
+    throw new Error("Missing return statement in function");
+}
+
+  static final public boolean verificarCompatibilidadTipos(String varType, String expr) throws ParseException {boolean compatible = false; // Variable para almacenar el resultado
+
+// Reglas para validar compatibilidad de tipos
+        if (varType.equals("int") && expr.matches("[0-9]+")) {
+            compatible = true;
+        } else if (varType.equals("float") && expr.matches("[0-9]+(\\.[0-9]+)?")) {
+            compatible = true;
+        } else if (varType.equals("int") && expr.matches("[0-9]+") && varType.equals("float") && expr.matches("[0-9]+(\\.[0-9]+)?")) {
+            compatible = true;
+        }else if (varType.equals("boolean") && (expr.equals("true") || expr.equals("false"))) {
+            compatible = true;
+        } else if (varType.equals("string") && expr.startsWith("\"") && expr.endsWith("\"")) {
+            compatible = true;
+        }
+{if ("" != null) return compatible;}
+    throw new Error("Missing return statement in function");
+}
+
   static private boolean jj_2_1(int xla)
  {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
@@ -1700,17 +1789,30 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
     finally { jj_save(3, xla); }
   }
 
-  static private boolean jj_3R_parteElseIf_907_5_15()
+  static private boolean jj_3R_parteElseIf_965_13_18()
+ {
+    if (jj_scan_token(CondicionalIf)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_asignacion_716_5_17()
+ {
+    if (jj_scan_token(IDENTIFICADOR)) return true;
+    if (jj_scan_token(Asignacion)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_parteElseIf_958_5_15()
  {
     if (jj_scan_token(CondicionalElse)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_parteElseIf_914_13_18()) jj_scanpos = xsp;
+    if (jj_3R_parteElseIf_965_13_18()) jj_scanpos = xsp;
     if (jj_scan_token(LlaveAbre)) return true;
     return false;
   }
 
-  static private boolean jj_3R_parteElse_960_5_16()
+  static private boolean jj_3R_parteElse_1011_5_16()
  {
     if (jj_scan_token(CondicionalElse)) return true;
     if (jj_scan_token(LlaveAbre)) return true;
@@ -1719,32 +1821,19 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 
   static private boolean jj_3_4()
  {
-    if (jj_3R_asignacion_671_5_17()) return true;
+    if (jj_3R_asignacion_716_5_17()) return true;
     return false;
   }
 
   static private boolean jj_3_1()
  {
-    if (jj_3R_parteElseIf_907_5_15()) return true;
+    if (jj_3R_parteElseIf_958_5_15()) return true;
     return false;
   }
 
   static private boolean jj_3_2()
  {
-    if (jj_3R_parteElse_960_5_16()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_asignacion_671_5_17()
- {
-    if (jj_scan_token(IDENTIFICADOR)) return true;
-    if (jj_scan_token(Asignacion)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_parteElseIf_914_13_18()
- {
-    if (jj_scan_token(CondicionalIf)) return true;
+    if (jj_3R_parteElse_1011_5_16()) return true;
     return false;
   }
 
