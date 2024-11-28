@@ -529,7 +529,6 @@ if (!control) {
             }
           case FALSO:{
             jj_consume_token(FALSO);
-codigo_temporal += " = " + (val.image.equals("Verdadero") ? "true" : "false");
             break;
             }
           default:
@@ -546,6 +545,7 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
         jj_la1[9] = jj_gen;
         ;
       }
+codigo_temporal += " = " + (val.image.equals("Verdadero") ? "true" : "false");
       jj_consume_token(DelimitadorLineaDeCodigo);
 codigo_temporal += "; \n";
             acumulador_cpp += codigo_temporal;

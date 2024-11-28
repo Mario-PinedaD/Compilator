@@ -559,13 +559,13 @@ void VariableBOOLEAN() : {
         [ <Asignacion>
             try {
                 val = <VERDADERO> | <FALSO>
-                {
-                    codigo_temporal += " = " + (val.image.equals("Verdadero") ? "true" : "false");
-                }
             } catch (ParseException e) {
                 tabla.add("Error de Sintaxis -> " + e.getMessage());
             }            
         ]
+        {
+            codigo_temporal += " = " + (val.image.equals("Verdadero") ? "true" : "false");
+        }
         <DelimitadorLineaDeCodigo>
         {
             codigo_temporal += "; \n";
