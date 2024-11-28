@@ -131,7 +131,6 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
         case Lectura:
         case Escritura:
         case CondicionalIf:
-        case CondicionalIfthen:
         case CondicionalSwitch:
         case CicloWhile:
         case CicloFor:
@@ -195,10 +194,6 @@ Token t;
       }
     case CondicionalIf:{
       condicionalIf();
-      break;
-      }
-    case CondicionalIfthen:{
-      condicionalIfthen();
       break;
       }
     case CicloFor:{
@@ -828,16 +823,17 @@ if(!casos.isEmpty()){
       parteIf();
       label_2:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case CondicionalElse:{
+        if (jj_2_1(2)) {
           ;
-          break;
-          }
-        default:
-          jj_la1[14] = jj_gen;
+        } else {
           break label_2;
         }
         parteElseIf();
+      }
+      if (jj_2_2(2)) {
+        parteElse();
+      } else {
+        ;
       }
     } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
@@ -870,7 +866,6 @@ acumulador_cpp += ") { \n\t";
       case Lectura:
       case Escritura:
       case CondicionalIf:
-      case CondicionalIfthen:
       case CondicionalSwitch:
       case CicloWhile:
       case CicloFor:
@@ -884,7 +879,7 @@ acumulador_cpp += ") { \n\t";
         break;
         }
       default:
-        jj_la1[15] = jj_gen;
+        jj_la1[14] = jj_gen;
         break label_3;
       }
       sentencias();
@@ -900,12 +895,7 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
   static final public void parteElseIf() throws ParseException {Token id;
     try {
       jj_consume_token(CondicionalElse);
-id = getToken(1);
-            if(id.image != "if"){
-
-            }
-            if(id.image == "{"){
-            }
+acumulador_cpp += "else ";
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case CondicionalIf:{
         jj_consume_token(CondicionalIf);
@@ -914,22 +904,23 @@ id = getToken(1);
         } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
+acumulador_cpp += "if (";
         condicion();
         try {
           jj_consume_token(ParentesisCierra);
         } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
-
+acumulador_cpp += ")";
         break;
         }
       default:
-        jj_la1[16] = jj_gen;
+        jj_la1[15] = jj_gen;
         ;
       }
       try {
         jj_consume_token(LlaveAbre);
-
+acumulador_cpp += " { \n";
       } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
@@ -939,7 +930,55 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
         case Lectura:
         case Escritura:
         case CondicionalIf:
-        case CondicionalIfthen:
+        case CondicionalSwitch:
+        case CicloWhile:
+        case CicloFor:
+        case TipoDatoEntero:
+        case TipoDatoDecimal:
+        case TipoDatoBooleano:
+        case TipoDatoCadena:
+        case TIpoDatoCaracter:
+        case IDENTIFICADOR:{
+          ;
+          break;
+          }
+        default:
+          jj_la1[16] = jj_gen;
+          break label_4;
+        }
+        sentencias();
+      }
+      try {
+        jj_consume_token(LlaveCierra);
+acumulador_cpp += "\t} \n";
+      } catch (ParseException e) {
+tabla.add("Error de Sintaxis -> " + e.getMessage());
+      }
+    } catch (ParseException e) {
+tabla.add("Error de Sintaxis -> " + e.getMessage());
+    }
+}
+
+  static final public void parteElse() throws ParseException {String startLabel = "";
+    try {
+      try {
+        jj_consume_token(CondicionalElse);
+acumulador_cpp += " else";
+      } catch (ParseException e) {
+tabla.add("Error de Sintaxis -> " + e.getMessage());
+      }
+      try {
+        jj_consume_token(LlaveAbre);
+acumulador_cpp += " {";
+      } catch (ParseException e) {
+tabla.add("Error de Sintaxis -> " + e.getMessage());
+      }
+      label_5:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case Lectura:
+        case Escritura:
+        case CondicionalIf:
         case CondicionalSwitch:
         case CicloWhile:
         case CicloFor:
@@ -954,165 +993,16 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
           }
         default:
           jj_la1[17] = jj_gen;
-          break label_4;
-        }
-        sentencias();
-      }
-
-      try {
-        jj_consume_token(LlaveCierra);
-      } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-      }
-    } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-    }
-}
-
-  static final public void parteElse() throws ParseException {String startLabel = "";
-    try {
-      jj_consume_token(CondicionalElse);
-      try {
-        jj_consume_token(LlaveAbre);
-      } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-      }
-      label_5:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case Lectura:
-        case Escritura:
-        case CondicionalIf:
-        case CondicionalIfthen:
-        case CondicionalSwitch:
-        case CicloWhile:
-        case CicloFor:
-        case TipoDatoEntero:
-        case TipoDatoDecimal:
-        case TipoDatoBooleano:
-        case TipoDatoCadena:
-        case TIpoDatoCaracter:
-        case IDENTIFICADOR:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[18] = jj_gen;
           break label_5;
         }
         sentencias();
       }
       try {
         jj_consume_token(LlaveCierra);
-
+acumulador_cpp += "\t} \n";
       } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
-    } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-    }
-}
-
-// Método auxiliar para manejar el bloque else opcional
-  static final public void condicionalElseBlock() throws ParseException {
-    try {
-      try {
-        jj_consume_token(CondicionalElse);
-      } catch (ParseException e) {
-// No hay bloque else, regresar
-                {if ("" != null) return;}
-      }
-      try {
-        jj_consume_token(LlaveAbre);
-      } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-      }
-      label_6:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case Lectura:
-        case Escritura:
-        case CondicionalIf:
-        case CondicionalIfthen:
-        case CondicionalSwitch:
-        case CicloWhile:
-        case CicloFor:
-        case TipoDatoEntero:
-        case TipoDatoDecimal:
-        case TipoDatoBooleano:
-        case TipoDatoCadena:
-        case TIpoDatoCaracter:
-        case IDENTIFICADOR:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[19] = jj_gen;
-          break label_6;
-        }
-        sentencias();
-      }
-      try {
-        jj_consume_token(LlaveCierra);
-      } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-      }
-    } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-    }
-}
-
-  static final public void condicionalIfthen() throws ParseException {String condFalseLabel;
-    try {
-      jj_consume_token(CondicionalIfthen);
-      try {
-        jj_consume_token(ParentesisAbre);
-      } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-      }
-      condicion();
-      try {
-        jj_consume_token(ParentesisCierra);
-      } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-      }
-
-      try {
-        jj_consume_token(LlaveAbre);
-      } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-      }
-      label_7:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case Lectura:
-        case Escritura:
-        case CondicionalIf:
-        case CondicionalIfthen:
-        case CondicionalSwitch:
-        case CicloWhile:
-        case CicloFor:
-        case TipoDatoEntero:
-        case TipoDatoDecimal:
-        case TipoDatoBooleano:
-        case TipoDatoCadena:
-        case TIpoDatoCaracter:
-        case IDENTIFICADOR:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[20] = jj_gen;
-          break label_7;
-        }
-        sentencias();
-      }
-      try {
-        jj_consume_token(LlaveCierra);
-      } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-      }
-
     } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
@@ -1124,81 +1014,82 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
     String condición = "";
     String incremento = "";
     try {
-      jj_consume_token(CicloFor);
-acumulador_cpp += "for (";
-      try {
-        jj_consume_token(ParentesisAbre);
-      } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-      }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case TipoDatoEntero:
-      case TipoDatoDecimal:
-      case TipoDatoBooleano:
-      case TipoDatoCadena:
-      case TIpoDatoCaracter:{
+      case CicloFor:{
+        jj_consume_token(CicloFor);
+acumulador_cpp += "for (";
+        try {
+          jj_consume_token(ParentesisAbre);
+        } catch (ParseException e) {
+tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
+        if (jj_2_3(3)) {
+
+        } else {
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
         declararVariables();
         break;
         }
-      case IDENTIFICADOR:{
-        asignacion();
-        break;
-        }
       default:
-        jj_la1[21] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
+        jj_la1[19] = jj_gen;
+        if (jj_2_4(2)) {
+          asignacion();
 acumulador_cpp += " ";
-      condicion();
-      try {
-        jj_consume_token(DelimitadorLineaDeCodigo);
-      } catch (ParseException e) {
+          condicion();
+          try {
+            jj_consume_token(DelimitadorLineaDeCodigo);
+          } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
-      }
-acumulador_cpp += "; ";
-      asignacionLogica();
-      try {
-        jj_consume_token(ParentesisCierra);
-      } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-      }
-      try {
-        jj_consume_token(LlaveAbre);
-      } catch (ParseException e) {
-tabla.add("Error de Sintaxis -> " + e.getMessage());
-      }
-      label_8:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case Lectura:
-        case Escritura:
-        case CondicionalIf:
-        case CondicionalIfthen:
-        case CondicionalSwitch:
-        case CicloWhile:
-        case CicloFor:
-        case TipoDatoEntero:
-        case TipoDatoDecimal:
-        case TipoDatoBooleano:
-        case TipoDatoCadena:
-        case TIpoDatoCaracter:
-        case IDENTIFICADOR:{
-          ;
-          break;
           }
-        default:
-          jj_la1[22] = jj_gen;
-          break label_8;
-        }
-        sentencias();
-      }
-      try {
-        jj_consume_token(LlaveCierra);
-      } catch (ParseException e) {
+acumulador_cpp += "; ";
+          asignacionLogica();
+          try {
+            jj_consume_token(ParentesisCierra);
+          } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
-      }
+          }
+          try {
+            jj_consume_token(LlaveAbre);
+          } catch (ParseException e) {
+tabla.add("Error de Sintaxis -> " + e.getMessage());
+          }
+          label_6:
+          while (true) {
+            switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+            case Lectura:
+            case Escritura:
+            case CondicionalIf:
+            case CondicionalSwitch:
+            case CicloWhile:
+            case CicloFor:
+            case TipoDatoEntero:
+            case TipoDatoDecimal:
+            case TipoDatoBooleano:
+            case TipoDatoCadena:
+            case TIpoDatoCaracter:
+            case IDENTIFICADOR:{
+              ;
+              break;
+              }
+            default:
+              jj_la1[18] = jj_gen;
+              break label_6;
+            }
+            sentencias();
+          }
+          try {
+            jj_consume_token(LlaveCierra);
+          } catch (ParseException e) {
+tabla.add("Error de Sintaxis -> " + e.getMessage());
+          }
 acumulador_cpp += "}\n";
+        } else {
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+      }
     } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
@@ -1217,7 +1108,7 @@ if (!linkers.declaredVariables.containsKey(id.image)) {
             } else {
                 varType = linkers.declaredVariables.get(id.image);
             }
-      label_9:
+      label_7:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case OperacionSuma:
@@ -1247,14 +1138,14 @@ incremento = operador.image;
             break;
             }
           default:
-            jj_la1[23] = jj_gen;
+            jj_la1[20] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
           break;
           }
         default:
-          jj_la1[24] = jj_gen;
+          jj_la1[21] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1270,8 +1161,8 @@ incremento = operador.image;
           break;
           }
         default:
-          jj_la1[25] = jj_gen;
-          break label_9;
+          jj_la1[22] = jj_gen;
+          break label_7;
         }
       }
 acumulador_cpp += incremento + ") {\n";
@@ -1301,13 +1192,12 @@ acumulador_cpp += ") {\n";
       } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
-      label_10:
+      label_8:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case Lectura:
         case Escritura:
         case CondicionalIf:
-        case CondicionalIfthen:
         case CondicionalSwitch:
         case CicloWhile:
         case CicloFor:
@@ -1321,8 +1211,8 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
           break;
           }
         default:
-          jj_la1[26] = jj_gen;
-          break label_10;
+          jj_la1[23] = jj_gen;
+          break label_8;
         }
         sentencias();
       }
@@ -1362,7 +1252,7 @@ linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
 if (!linkers.declaredVariables.containsKey(id.image)) {
                 linkers.tabla.add("Error Sem\u00e1ntico -> Variable no declarada: " + id.image + " en l\u00ednea " + id.beginLine + ", columna " + id.beginColumn);
             }
-      label_11:
+      label_9:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case Caso:{
@@ -1370,8 +1260,8 @@ if (!linkers.declaredVariables.containsKey(id.image)) {
           break;
           }
         default:
-          jj_la1[27] = jj_gen;
-          break label_11;
+          jj_la1[24] = jj_gen;
+          break label_9;
         }
         caso();
       }
@@ -1381,7 +1271,7 @@ if (!linkers.declaredVariables.containsKey(id.image)) {
         break;
         }
       default:
-        jj_la1[28] = jj_gen;
+        jj_la1[25] = jj_gen;
         ;
       }
       jj_consume_token(LlaveCierra);
@@ -1400,13 +1290,12 @@ Token t;
     caseValue = jj_consume_token(NUMERO);
     jj_consume_token(DelimitadorCasoSwitch);
 acumulador_cpp += "\tcase " + caseValue.image + ":\n";
-    label_12:
+    label_10:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case Lectura:
       case Escritura:
       case CondicionalIf:
-      case CondicionalIfthen:
       case CondicionalSwitch:
       case CicloWhile:
       case CicloFor:
@@ -1420,8 +1309,8 @@ acumulador_cpp += "\tcase " + caseValue.image + ":\n";
         break;
         }
       default:
-        jj_la1[29] = jj_gen;
-        break label_12;
+        jj_la1[26] = jj_gen;
+        break label_10;
       }
       sentencias();
     }
@@ -1435,13 +1324,12 @@ acumulador_cpp += "\tbreak;\n";
     jj_consume_token(Default);
     jj_consume_token(DelimitadorCasoSwitch);
 acumulador_cpp += "\tdefault: \n";
-    label_13:
+    label_11:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case Lectura:
       case Escritura:
       case CondicionalIf:
-      case CondicionalIfthen:
       case CondicionalSwitch:
       case CicloWhile:
       case CicloFor:
@@ -1455,8 +1343,8 @@ acumulador_cpp += "\tdefault: \n";
         break;
         }
       default:
-        jj_la1[30] = jj_gen;
-        break label_13;
+        jj_la1[27] = jj_gen;
+        break label_11;
       }
       sentencias();
     }
@@ -1465,7 +1353,7 @@ acumulador_cpp += "\tdefault: \n";
   static final public void condicion() throws ParseException {
 acumulador_cpp += "(";
     condicionSimple();
-    label_14:
+    label_12:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case OperacionAnd:
@@ -1475,8 +1363,8 @@ acumulador_cpp += "(";
         break;
         }
       default:
-        jj_la1[31] = jj_gen;
-        break label_14;
+        jj_la1[28] = jj_gen;
+        break label_12;
       }
       operadorLogico();
 acumulador_cpp += " " + token.image + "";
@@ -1536,7 +1424,7 @@ opStr = "!=";
       break;
       }
     default:
-      jj_la1[32] = jj_gen;
+      jj_la1[29] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1563,7 +1451,7 @@ opStr = "!";
       break;
       }
     default:
-      jj_la1[33] = jj_gen;
+      jj_la1[30] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1600,7 +1488,7 @@ opStr = "%";
       break;
       }
     default:
-      jj_la1[34] = jj_gen;
+      jj_la1[31] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1611,7 +1499,7 @@ opStr = "%";
   static final public String expresion(String expectedType) throws ParseException {String type = expectedType;
     String expr = "";
 expr = termino(expectedType);
-    label_15:
+    label_13:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case OperacionSuma:
@@ -1623,8 +1511,8 @@ expr = termino(expectedType);
         break;
         }
       default:
-        jj_la1[35] = jj_gen;
-        break label_15;
+        jj_la1[32] = jj_gen;
+        break label_13;
       }
       operadorAritmetico();
 Token op = token;
@@ -1638,7 +1526,7 @@ Token op = token;
   static final public String termino(String expectedType) throws ParseException {String type = expectedType;
     String term = "";
 term = factor(expectedType);
-    label_16:
+    label_14:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case OperacionSuma:
@@ -1650,8 +1538,8 @@ term = factor(expectedType);
         break;
         }
       default:
-        jj_la1[36] = jj_gen;
-        break label_16;
+        jj_la1[33] = jj_gen;
+        break label_14;
       }
       operadorAritmetico();
 Token op = token;
@@ -1780,6 +1668,92 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
     throw new Error("Missing return statement in function");
 }
 
+  static private boolean jj_2_1(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_1()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(0, xla); }
+  }
+
+  static private boolean jj_2_2(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_2()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(1, xla); }
+  }
+
+  static private boolean jj_2_3(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_3()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(2, xla); }
+  }
+
+  static private boolean jj_2_4(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_4()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(3, xla); }
+  }
+
+  static private boolean jj_3R_parteElseIf_907_5_15()
+ {
+    if (jj_scan_token(CondicionalElse)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_parteElseIf_914_13_18()) jj_scanpos = xsp;
+    if (jj_scan_token(LlaveAbre)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_parteElse_960_5_16()
+ {
+    if (jj_scan_token(CondicionalElse)) return true;
+    if (jj_scan_token(LlaveAbre)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_4()
+ {
+    if (jj_3R_asignacion_671_5_17()) return true;
+    return false;
+  }
+
+  static private boolean jj_3_1()
+ {
+    if (jj_3R_parteElseIf_907_5_15()) return true;
+    return false;
+  }
+
+  static private boolean jj_3_2()
+ {
+    if (jj_3R_parteElse_960_5_16()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_asignacion_671_5_17()
+ {
+    if (jj_scan_token(IDENTIFICADOR)) return true;
+    if (jj_scan_token(Asignacion)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_parteElseIf_914_13_18()
+ {
+    if (jj_scan_token(CondicionalIf)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_3()
+ {
+    if (jj_scan_token(0)) return true;
+    return false;
+  }
+
   static private boolean jj_initialized_once = false;
   /** Generated Token Manager. */
   static public linkersTokenManager token_source;
@@ -1789,8 +1763,10 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
   /** Next token. */
   static public Token jj_nt;
   static private int jj_ntk;
+  static private Token jj_scanpos, jj_lastpos;
+  static private int jj_la;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[37];
+  static final private int[] jj_la1 = new int[34];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -1800,14 +1776,17 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 	   jj_la1_init_2();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0xf8003dc,0xf8003dc,0xf800000,0x0,0x0,0x0,0x0,0x0,0x6000,0x0,0x0,0x0,0x0,0x0,0x20,0xf8003dc,0x10,0xf8003dc,0xf8003dc,0xf8003dc,0xf8003dc,0xf800000,0xf8003dc,0x0,0x0,0x0,0xf8003dc,0x800,0x400,0xf8003dc,0xf8003dc,0x0,0x0,0x0,0x0,0x0,0x0,};
+	   jj_la1_0 = new int[] {0x7c001dc,0x7c001dc,0x7c00000,0x0,0x0,0x0,0x0,0x0,0x3000,0x0,0x0,0x0,0x0,0x0,0x7c001dc,0x10,0x7c001dc,0x7c001dc,0x7c001dc,0x100,0x0,0x0,0x0,0x7c001dc,0x400,0x200,0x7c001dc,0x7c001dc,0x0,0x0,0x0,0x0,0x0,0x0,};
 	}
 	private static void jj_la1_init_1() {
-	   jj_la1_1 = new int[] {0x2000000,0x2000000,0x0,0x4,0x4000,0x4,0x4000,0x4,0x0,0x4000,0x4,0x4000,0x4,0x4000,0x0,0x2000000,0x0,0x2000000,0x2000000,0x2000000,0x2000000,0x2000000,0x2000000,0x3000,0x33e0,0x33e0,0x2000000,0x0,0x0,0x2000000,0x2000000,0xe00000,0x1f8000,0xe00000,0x3e0,0x3e0,0x3e0,};
+	   jj_la1_1 = new int[] {0x1000000,0x1000000,0x0,0x2,0x2000,0x2,0x2000,0x2,0x0,0x2000,0x2,0x2000,0x2,0x2000,0x1000000,0x0,0x1000000,0x1000000,0x1000000,0x0,0x1800,0x19f0,0x19f0,0x1000000,0x0,0x0,0x1000000,0x1000000,0x700000,0xfc000,0x700000,0x1f0,0x1f0,0x1f0,};
 	}
 	private static void jj_la1_init_2() {
-	   jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+	   jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
 	}
+  static final private JJCalls[] jj_2_rtns = new JJCalls[4];
+  static private boolean jj_rescan = false;
+  static private int jj_gc = 0;
 
   /** Constructor with InputStream. */
   public linkers(java.io.InputStream stream) {
@@ -1827,7 +1806,8 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 37; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 34; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Reinitialise. */
@@ -1841,7 +1821,8 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 37; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 34; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Constructor. */
@@ -1858,7 +1839,8 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 37; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 34; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Reinitialise. */
@@ -1876,7 +1858,8 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 37; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 34; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Constructor with generated Token Manager. */
@@ -1892,7 +1875,8 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 37; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 34; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Reinitialise. */
@@ -1901,7 +1885,8 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 37; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 34; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -1911,11 +1896,50 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 	 jj_ntk = -1;
 	 if (token.kind == kind) {
 	   jj_gen++;
+	   if (++jj_gc > 100) {
+		 jj_gc = 0;
+		 for (int i = 0; i < jj_2_rtns.length; i++) {
+		   JJCalls c = jj_2_rtns[i];
+		   while (c != null) {
+			 if (c.gen < jj_gen) c.first = null;
+			 c = c.next;
+		   }
+		 }
+	   }
 	   return token;
 	 }
 	 token = oldToken;
 	 jj_kind = kind;
 	 throw generateParseException();
+  }
+
+  @SuppressWarnings("serial")
+  static private final class LookaheadSuccess extends java.lang.Error {
+    @Override
+    public Throwable fillInStackTrace() {
+      return this;
+    }
+  }
+  static private final LookaheadSuccess jj_ls = new LookaheadSuccess();
+  static private boolean jj_scan_token(int kind) {
+	 if (jj_scanpos == jj_lastpos) {
+	   jj_la--;
+	   if (jj_scanpos.next == null) {
+		 jj_lastpos = jj_scanpos = jj_scanpos.next = token_source.getNextToken();
+	   } else {
+		 jj_lastpos = jj_scanpos = jj_scanpos.next;
+	   }
+	 } else {
+	   jj_scanpos = jj_scanpos.next;
+	 }
+	 if (jj_rescan) {
+	   int i = 0; Token tok = token;
+	   while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }
+	   if (tok != null) jj_add_error_token(kind, i);
+	 }
+	 if (jj_scanpos.kind != kind) return true;
+	 if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
+	 return false;
   }
 
 
@@ -1948,16 +1972,56 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
   static private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
   static private int[] jj_expentry;
   static private int jj_kind = -1;
+  static private int[] jj_lasttokens = new int[100];
+  static private int jj_endpos;
+
+  static private void jj_add_error_token(int kind, int pos) {
+	 if (pos >= 100) {
+		return;
+	 }
+
+	 if (pos == jj_endpos + 1) {
+	   jj_lasttokens[jj_endpos++] = kind;
+	 } else if (jj_endpos != 0) {
+	   jj_expentry = new int[jj_endpos];
+
+	   for (int i = 0; i < jj_endpos; i++) {
+		 jj_expentry[i] = jj_lasttokens[i];
+	   }
+
+	   for (int[] oldentry : jj_expentries) {
+		 if (oldentry.length == jj_expentry.length) {
+		   boolean isMatched = true;
+
+		   for (int i = 0; i < jj_expentry.length; i++) {
+			 if (oldentry[i] != jj_expentry[i]) {
+			   isMatched = false;
+			   break;
+			 }
+
+		   }
+		   if (isMatched) {
+			 jj_expentries.add(jj_expentry);
+			 break;
+		   }
+		 }
+	   }
+
+	   if (pos != 0) {
+		 jj_lasttokens[(jj_endpos = pos) - 1] = kind;
+	   }
+	 }
+  }
 
   /** Generate ParseException. */
   static public ParseException generateParseException() {
 	 jj_expentries.clear();
-	 boolean[] la1tokens = new boolean[68];
+	 boolean[] la1tokens = new boolean[67];
 	 if (jj_kind >= 0) {
 	   la1tokens[jj_kind] = true;
 	   jj_kind = -1;
 	 }
-	 for (int i = 0; i < 37; i++) {
+	 for (int i = 0; i < 34; i++) {
 	   if (jj_la1[i] == jj_gen) {
 		 for (int j = 0; j < 32; j++) {
 		   if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -1972,13 +2036,16 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 		 }
 	   }
 	 }
-	 for (int i = 0; i < 68; i++) {
+	 for (int i = 0; i < 67; i++) {
 	   if (la1tokens[i]) {
 		 jj_expentry = new int[1];
 		 jj_expentry[0] = i;
 		 jj_expentries.add(jj_expentry);
 	   }
 	 }
+	 jj_endpos = 0;
+	 jj_rescan_token();
+	 jj_add_error_token(0, 0);
 	 int[][] exptokseq = new int[jj_expentries.size()][];
 	 for (int i = 0; i < jj_expentries.size(); i++) {
 	   exptokseq[i] = jj_expentries.get(i);
@@ -1999,6 +2066,49 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 
   /** Disable tracing. */
   static final public void disable_tracing() {
+  }
+
+  static private void jj_rescan_token() {
+	 jj_rescan = true;
+	 for (int i = 0; i < 4; i++) {
+	   try {
+		 JJCalls p = jj_2_rtns[i];
+
+		 do {
+		   if (p.gen > jj_gen) {
+			 jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;
+			 switch (i) {
+			   case 0: jj_3_1(); break;
+			   case 1: jj_3_2(); break;
+			   case 2: jj_3_3(); break;
+			   case 3: jj_3_4(); break;
+			 }
+		   }
+		   p = p.next;
+		 } while (p != null);
+
+		 } catch(LookaheadSuccess ls) { }
+	 }
+	 jj_rescan = false;
+  }
+
+  static private void jj_save(int index, int xla) {
+	 JJCalls p = jj_2_rtns[index];
+	 while (p.gen > jj_gen) {
+	   if (p.next == null) { p = p.next = new JJCalls(); break; }
+	   p = p.next;
+	 }
+
+	 p.gen = jj_gen + xla - jj_la; 
+	 p.first = token;
+	 p.arg = xla;
+  }
+
+  static final class JJCalls {
+	 int gen;
+	 Token first;
+	 int arg;
+	 JJCalls next;
   }
 
 }

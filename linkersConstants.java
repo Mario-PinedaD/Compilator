@@ -19,117 +19,115 @@ public interface linkersConstants {
   /** RegularExpression Id. */
   int CondicionalElse = 5;
   /** RegularExpression Id. */
-  int CondicionalIfthen = 6;
+  int CondicionalSwitch = 6;
   /** RegularExpression Id. */
-  int CondicionalSwitch = 7;
+  int CicloWhile = 7;
   /** RegularExpression Id. */
-  int CicloWhile = 8;
+  int CicloFor = 8;
   /** RegularExpression Id. */
-  int CicloFor = 9;
+  int Default = 9;
   /** RegularExpression Id. */
-  int Default = 10;
+  int Caso = 10;
   /** RegularExpression Id. */
-  int Caso = 11;
+  int Break = 11;
   /** RegularExpression Id. */
-  int Break = 12;
+  int VERDADERO = 12;
   /** RegularExpression Id. */
-  int VERDADERO = 13;
+  int FALSO = 13;
   /** RegularExpression Id. */
-  int FALSO = 14;
+  int PUBLICO = 14;
   /** RegularExpression Id. */
-  int PUBLICO = 15;
+  int PRIVADO = 15;
   /** RegularExpression Id. */
-  int PRIVADO = 16;
+  int NoRetorno = 16;
   /** RegularExpression Id. */
-  int NoRetorno = 17;
+  int Start = 17;
   /** RegularExpression Id. */
-  int Start = 18;
+  int End = 18;
   /** RegularExpression Id. */
-  int End = 19;
+  int Funcion = 19;
   /** RegularExpression Id. */
-  int Funcion = 20;
+  int Retorno = 20;
   /** RegularExpression Id. */
-  int Retorno = 21;
+  int LlamarFuncion = 21;
   /** RegularExpression Id. */
-  int LlamarFuncion = 22;
+  int TipoDatoEntero = 22;
   /** RegularExpression Id. */
-  int TipoDatoEntero = 23;
+  int TipoDatoDecimal = 23;
   /** RegularExpression Id. */
-  int TipoDatoDecimal = 24;
+  int TipoDatoBooleano = 24;
   /** RegularExpression Id. */
-  int TipoDatoBooleano = 25;
+  int TipoDatoCadena = 25;
   /** RegularExpression Id. */
-  int TipoDatoCadena = 26;
+  int TIpoDatoCaracter = 26;
   /** RegularExpression Id. */
-  int TIpoDatoCaracter = 27;
+  int LlaveAbre = 27;
   /** RegularExpression Id. */
-  int LlaveAbre = 28;
+  int LlaveCierra = 28;
   /** RegularExpression Id. */
-  int LlaveCierra = 29;
+  int ParentesisAbre = 29;
   /** RegularExpression Id. */
-  int ParentesisAbre = 30;
+  int ParentesisCierra = 30;
   /** RegularExpression Id. */
-  int ParentesisCierra = 31;
+  int DelimitadorLineaDeCodigo = 31;
   /** RegularExpression Id. */
-  int DelimitadorLineaDeCodigo = 32;
+  int DelimitadorCasoSwitch = 32;
   /** RegularExpression Id. */
-  int DelimitadorCasoSwitch = 33;
+  int CorcheteAbre = 33;
   /** RegularExpression Id. */
-  int CorcheteAbre = 34;
+  int CorcheteCierra = 34;
   /** RegularExpression Id. */
-  int CorcheteCierra = 35;
+  int Coma = 35;
   /** RegularExpression Id. */
-  int Coma = 36;
+  int OperacionSuma = 36;
   /** RegularExpression Id. */
-  int OperacionSuma = 37;
+  int OperacionResta = 37;
   /** RegularExpression Id. */
-  int OperacionResta = 38;
+  int OperacionMultiplicacion = 38;
   /** RegularExpression Id. */
-  int OperacionMultiplicacion = 39;
+  int OperacionDivision = 39;
   /** RegularExpression Id. */
-  int OperacionDivision = 40;
+  int OperacionResiduo = 40;
   /** RegularExpression Id. */
-  int OperacionResiduo = 41;
+  int OperacionIncremento = 41;
   /** RegularExpression Id. */
-  int OperacionIncremento = 42;
+  int OperacionDecremento = 42;
   /** RegularExpression Id. */
-  int OperacionDecremento = 43;
+  int OperadorIncremento = 43;
   /** RegularExpression Id. */
-  int OperadorIncremento = 44;
+  int OperadorDecremento = 44;
   /** RegularExpression Id. */
-  int OperadorDecremento = 45;
+  int Asignacion = 45;
   /** RegularExpression Id. */
-  int Asignacion = 46;
+  int OperacionMayorQue = 46;
   /** RegularExpression Id. */
-  int OperacionMayorQue = 47;
+  int OperacionMenorQue = 47;
   /** RegularExpression Id. */
-  int OperacionMenorQue = 48;
+  int OperacionMenorOIgualQue = 48;
   /** RegularExpression Id. */
-  int OperacionMenorOIgualQue = 49;
+  int OperacionMayorOIgualQue = 49;
   /** RegularExpression Id. */
-  int OperacionMayorOIgualQue = 50;
+  int OperacionIgualdad = 50;
   /** RegularExpression Id. */
-  int OperacionIgualdad = 51;
+  int OperacionDesigualdad = 51;
   /** RegularExpression Id. */
-  int OperacionDesigualdad = 52;
+  int OperacionAnd = 52;
   /** RegularExpression Id. */
-  int OperacionAnd = 53;
+  int OperacionOr = 53;
   /** RegularExpression Id. */
-  int OperacionOr = 54;
+  int OperacionNot = 54;
   /** RegularExpression Id. */
-  int OperacionNot = 55;
+  int CADENA = 55;
   /** RegularExpression Id. */
-  int CADENA = 56;
+  int IDENTIFICADOR = 56;
   /** RegularExpression Id. */
-  int IDENTIFICADOR = 57;
+  int NUMERO_FLOTANTE = 57;
   /** RegularExpression Id. */
-  int NUMERO_FLOTANTE = 58;
+  int NUMERO = 58;
   /** RegularExpression Id. */
-  int NUMERO = 59;
+  int LETRA = 59;
   /** RegularExpression Id. */
-  int LETRA = 60;
-  /** RegularExpression Id. */
-  int ANYTHING = 67;
+  int ANYTHING = 66;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -142,7 +140,6 @@ public interface linkersConstants {
     "\"Escribir\"",
     "\"if\"",
     "\"else\"",
-    "\"ifthen\"",
     "\"Switch\"",
     "\"While\"",
     "\"For\"",
@@ -201,8 +198,8 @@ public interface linkersConstants {
     "\"\\t\"",
     "\"\\r\"",
     "\"\\n\"",
+    "<token of kind 64>",
     "<token of kind 65>",
-    "<token of kind 66>",
     "<ANYTHING>",
   };
 
