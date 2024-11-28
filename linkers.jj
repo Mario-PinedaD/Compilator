@@ -141,7 +141,6 @@ TOKEN: {//PALABRAS RESERVADAS
     | <Escritura: "Escribir">
     | <CondicionalIf: "if">
     | <CondicionalElse: "else"> 
-    | <CondicionalIfthen: "ifthen">
     | <CondicionalSwitch: "Switch">
     | <CicloWhile: "While">
     | <CicloFor: "For">
@@ -269,7 +268,6 @@ void sentencias() : {} {
     | entrada()
     | salida()
     | condicionalIf()
-    | condicionalIfthen()
     | cicloFor()
     | cicloWhile()
     | condicionalSwitch()
@@ -686,6 +684,8 @@ void asignacion() : {
                 linkers.tabla.add("Error Semántico -> Tipo incorrecto en la operación. Se esperaba: " + varType + " pero se obtuvo: " + expr + " en línea " + id.beginLine + ", columna " + id.beginColumn);
             }
         }
+        
+
         <DelimitadorLineaDeCodigo>
         {
             String codigo_temporal = id.image + " = " + expr + "; \n";
@@ -861,10 +861,11 @@ void condicionalIf() : {} {
             acumulador_cpp += "\tif (";
         }
         parteIf()
-
-        ( parteElseIf() )*
-
-        // [ parteElse() ]
+        (
+            LOOKAHEAD(2) parteElseIf()
+        )*
+        (LOOKAHEAD(2) parteElse())?
+        
     } catch (ParseException e) {
         tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
@@ -908,12 +909,7 @@ void parteElseIf() : {
     try{
         <CondicionalElse>
         {
-            id = getToken(1);
-            if(id.image != "if"){
-                
-            }
-            if(id.image == "{"){
-            }
+            acumulador_cpp += "else ";
         }
         
         [
@@ -923,6 +919,9 @@ void parteElseIf() : {
                 } catch (ParseException e) {
                     tabla.add("Error de Sintaxis -> " + e.getMessage());
                 }
+                {
+                    acumulador_cpp += "if (";
+                }
                 condicion()
 
                 try {
@@ -930,18 +929,23 @@ void parteElseIf() : {
                 } catch (ParseException e) {
                     tabla.add("Error de Sintaxis -> " + e.getMessage());
                 }
-                { }
+                { 
+                    acumulador_cpp += ")";
+                }
         ]
         try {
-            <LlaveAbre>{
+            <LlaveAbre> {
+                acumulador_cpp += " { \n";
             }
         } catch (ParseException e) {
             tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
-        (sentencias())* {
-        }
+        (sentencias())*
         try {
             <LlaveCierra>
+            {
+                acumulador_cpp += "\t} \n";
+            }
         } catch (ParseException e) {
             tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
@@ -956,21 +960,25 @@ void parteElse() : {
 }
 {
     try{
-        //try{
-        <CondicionalElse>
-        //}catch (ParseException e){
-        //    return;
-        //}
+        try{
+            <CondicionalElse> {
+                acumulador_cpp += " else";
+            }
+        }catch (ParseException e){
+            tabla.add("Error de Sintaxis -> " + e.getMessage());
+        }
 
         try {
-            <LlaveAbre>
-
+            <LlaveAbre> {
+                acumulador_cpp += " {";
+            }
         } catch (ParseException e) {
             tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
         (sentencias())*
         try {
             <LlaveCierra>{
+                acumulador_cpp += "\t} \n";
             }
         } catch (ParseException e) {
             tabla.add("Error de Sintaxis -> " + e.getMessage());
@@ -980,74 +988,6 @@ void parteElse() : {
         tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
 }
-
-
-// Método auxiliar para manejar el bloque else opcional
-void condicionalElseBlock() : {} {
-    try {
-        (
-            // Intentar consumir 'else'
-            try {
-                <CondicionalElse>
-            } catch (ParseException e) {
-                // No hay bloque else, regresar
-                return;
-            }
-            try {
-                <LlaveAbre>
-            } catch (ParseException e) {
-                tabla.add("Error de Sintaxis -> " + e.getMessage());
-            }
-            (sentencias())*
-            try {
-                <LlaveCierra>
-            } catch (ParseException e) {
-                tabla.add("Error de Sintaxis -> " + e.getMessage());
-            }
-        )
-    } catch (ParseException e) {
-        tabla.add("Error de Sintaxis -> " + e.getMessage());
-    }
-}
-
-void condicionalIfthen() : {
-    String condFalseLabel;
-} {
-    // Este método puede ser eliminado si no se utiliza o ajustado según las necesidades
-    try {
-        <CondicionalIfthen>
-        try {
-            <ParentesisAbre>
-        } catch (ParseException e) {
-            tabla.add("Error de Sintaxis -> " + e.getMessage());
-        }
-        condicion()
-        try {
-            <ParentesisCierra>
-        } catch (ParseException e) {
-            tabla.add("Error de Sintaxis -> " + e.getMessage());
-        }
-        {
-        }
-        try {
-            <LlaveAbre>
-        } catch (ParseException e) {
-            tabla.add("Error de Sintaxis -> " + e.getMessage());
-        }
-        (sentencias())*
-        try {
-            <LlaveCierra>
-        } catch (ParseException e) {
-            tabla.add("Error de Sintaxis -> " + e.getMessage());
-        }
-        {
-        }
-    } catch (ParseException e) {
-        tabla.add("Error de Sintaxis -> " + e.getMessage());
-    }
-}
-
-
 
 void cicloFor() : {
     Token id, num, operador;
@@ -1066,10 +1006,7 @@ void cicloFor() : {
         } catch (ParseException e) {
             tabla.add("Error de Sintaxis -> " + e.getMessage());
         }
-        (
-            declararVariables() 
-            | asignacion()
-        )
+        LOOKAHEAD (3) declararVariables() | LOOKAHEAD(2) asignacion()
         {
             acumulador_cpp += " ";
         }
