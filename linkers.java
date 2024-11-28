@@ -19,7 +19,8 @@ class linkers implements linkersConstants {
     static ArrayList<String> casos = new ArrayList<>();
 
     public static void main(String[] args) throws FileNotFoundException {
-        generador = new CodigoCPP("~/Documents/Automatas/Compilator/", "conversion");
+        String archivo = "codigo_objeto";
+        generador = new CodigoCPP("./", archivo);
 
         try {
             linkers link = new linkers(System.in);
@@ -33,6 +34,8 @@ class linkers implements linkersConstants {
             } else {
                 System.out.println("\u001b[32mAn\u00e1lisis exitoso\u001b[0m");
                 System.out.print(acumulador_cpp);
+                compilarEjecutable("./" + archivo + ".cpp");
+                ejecutarCompilado("./" + archivo + "\\");
             }
 
         } catch (ParseException e) {
@@ -48,11 +51,54 @@ class linkers implements linkersConstants {
         }
     }
 
-
     static String obtenerNombreArchivo(File archivo) {
         String nombre = archivo.getName();
         int pos = nombre.lastIndexOf(".");
         return pos > 0 ? nombre.substring(0, pos) : nombre;
+    }
+
+    static void compilarEjecutable(String sourcePath) {
+        String output = sourcePath.replace(".cpp", " ");
+        ProcessBuilder pb = new ProcessBuilder("g++", sourcePath, "-o", output);
+        try {
+            Process proceso = pb.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(proceso.getErrorStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            while ((line = errorReader.readLine()) !=  null) {
+                System.err.println(line);
+            }
+            int exitCode = proceso.waitFor();
+            System.out.println("GCC termin\u00f3 con el c\u00f3digo de salida: " + exitCode);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void ejecutarCompilado(String file) {
+        ProcessBuilder pb = new ProcessBuilder(file);
+        try {
+            Process proceso = pb.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(proceso.getErrorStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            while ((line = errorReader.readLine()) !=  null) {
+                System.err.println(line);
+            }
+            int exitCode = proceso.waitFor();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     static class CodigoCPP {
@@ -65,8 +111,8 @@ class linkers implements linkersConstants {
                 "#include <iostream>\n" +
                 // "#include <Windows.h>\n" +
                 "using namespace std;\n" +
-                "int main() {\n" +
-                "\tSetConsoleOutputCP(CP_UTF8);\n"
+                "int main() {\n"
+                // "\tSetConsoleOutputCP(CP_UTF8);\n"
             );
         }
 
@@ -1700,17 +1746,36 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
     finally { jj_save(3, xla); }
   }
 
-  static private boolean jj_3R_parteElseIf_907_5_15()
+  static private boolean jj_3_2()
+ {
+    if (jj_3R_parteElse_1008_5_16()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_parteElseIf_962_13_18()
+ {
+    if (jj_scan_token(CondicionalIf)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_asignacion_717_5_17()
+ {
+    if (jj_scan_token(IDENTIFICADOR)) return true;
+    if (jj_scan_token(Asignacion)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_parteElseIf_955_5_15()
  {
     if (jj_scan_token(CondicionalElse)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_parteElseIf_914_13_18()) jj_scanpos = xsp;
+    if (jj_3R_parteElseIf_962_13_18()) jj_scanpos = xsp;
     if (jj_scan_token(LlaveAbre)) return true;
     return false;
   }
 
-  static private boolean jj_3R_parteElse_960_5_16()
+  static private boolean jj_3R_parteElse_1008_5_16()
  {
     if (jj_scan_token(CondicionalElse)) return true;
     if (jj_scan_token(LlaveAbre)) return true;
@@ -1719,38 +1784,19 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
 
   static private boolean jj_3_4()
  {
-    if (jj_3R_asignacion_671_5_17()) return true;
-    return false;
-  }
-
-  static private boolean jj_3_1()
- {
-    if (jj_3R_parteElseIf_907_5_15()) return true;
-    return false;
-  }
-
-  static private boolean jj_3_2()
- {
-    if (jj_3R_parteElse_960_5_16()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_asignacion_671_5_17()
- {
-    if (jj_scan_token(IDENTIFICADOR)) return true;
-    if (jj_scan_token(Asignacion)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_parteElseIf_914_13_18()
- {
-    if (jj_scan_token(CondicionalIf)) return true;
+    if (jj_3R_asignacion_717_5_17()) return true;
     return false;
   }
 
   static private boolean jj_3_3()
  {
     if (jj_scan_token(0)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_1()
+ {
+    if (jj_3R_parteElseIf_955_5_15()) return true;
     return false;
   }
 
