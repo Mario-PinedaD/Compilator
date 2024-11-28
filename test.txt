@@ -5,7 +5,7 @@ INICIAR {
     boolean d = Verdadero;
     Entero g[2];
     
-    // a =  5 + 2 * 44 - 5;
+    a = 5 + 2;
     Leer (a);
 
     Escribir("El valor de a" + a);
@@ -25,10 +25,6 @@ INICIAR {
     }else{
         Escribir("No cumplió con ninguna y se fué al Else");
     }
-
-   For (int var = 0; var < 10; var+=1) {
-    Escribir("Hola");
-   }
 
     Switch (a){
         Caso 1:

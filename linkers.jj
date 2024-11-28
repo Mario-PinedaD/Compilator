@@ -37,7 +37,7 @@ class linkers {
                 }
             } else {
                 System.out.println("\u001B[32mAnálisis exitoso\u001B[0m");
-                System.out.print(acumulador_cpp);
+                // System.out.print(acumulador_cpp);
                 compilarEjecutable("./" + archivo + ".cpp");
             }
 
@@ -710,12 +710,13 @@ void VariableCARACTER() : {
  */
 void asignacion() : {
     Token id;
-    String varType = "";
-    String expr;
+    String varType = ""; 
+    String expr = "";    
 } {
     try {
         id = <IDENTIFICADOR>
         {
+            // Verificar que la variable esté declarada
             if (!linkers.declaredVariables.containsKey(id.image)) {
                 linkers.tabla.add("Error Semántico -> Variable no declarada: " + id.image + " en línea " + id.beginLine + ", columna " + id.beginColumn);
             } else {
@@ -724,26 +725,29 @@ void asignacion() : {
         }
         <Asignacion>
         {
+            // Generar la expresión
             expr = expresion(varType);
-            if (!expr.equals(varType)) {
-                linkers.tabla.add("Error Semántico -> Tipo incorrecto en la operación. Se esperaba: " + varType + " pero se obtuvo: " + expr + " en línea " + id.beginLine + ", columna " + id.beginColumn);
-            }
+            
+            // // Validar que el tipo de la expresión sea compatible
+            // if (!verificarCompatibilidadTipos(varType, expr)) {
+            //     linkers.tabla.add("Error Semántico -> Tipo incompatible en la asignación. Se esperaba: " + varType + " pero se obtuvo algo diferente en línea " + id.beginLine + ", columna " + id.beginColumn);
+            // }
         }
-
-
         <DelimitadorLineaDeCodigo>
         {
-            String codigo_temporal = id.image + " = " + expr + "; \n";
-            acumulador_cpp += codigo_temporal;
+            // Agregar la traducción al acumulador
+            String codigo_temporal = id.image + " = " + expr + ";\n";
+            acumulador_cpp += "\t" + codigo_temporal;
         }
     } catch (ParseException e) {
         Token t;
         do {
             t = getNextToken();
         } while (t.kind != DelimitadorLineaDeCodigo && t.kind != EOF);
-        tabla.add("Error de Sintaxis -> " + e.getMessage());
+        linkers.tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
 }
+
 
 void entrada() : {
     Token token;
@@ -1346,7 +1350,7 @@ String expresion(String expectedType) : {
     String type = expectedType;
     String expr = "";
 } {
-    { expr = termino(expectedType); }
+    expr = termino(expectedType)
     (
         operadorAritmetico()
         {
@@ -1361,8 +1365,9 @@ String expresion(String expectedType) : {
 String termino(String expectedType) : {
     String type = expectedType;
     String term = "";
+    String factorType;
 } {
-    { term = factor(expectedType); }
+    term = factor(expectedType)
     (
         operadorAritmetico()
         {
@@ -1373,6 +1378,7 @@ String termino(String expectedType) : {
     )*
     { return term; }
 }
+
 
 
 String factor(String expectedType) : {
@@ -1495,5 +1501,45 @@ Token valor() : {
         throw e;
     }
     {return token;}
+}
+
+boolean esTipoCompatible(String tipo1, String tipo2) : {} {
+    { return (tipo1.equals("int") && tipo2.equals("int")) || 
+             (tipo1.equals("float") && (tipo2.equals("int") || tipo2.equals("float"))) || 
+             (tipo1.equals("int") && tipo2.equals("float")); }
+}
+
+String actualizarTipoResultante(String tipo1, String tipo2) : {
+    String tipo;
+} {
+    {if (tipo1.equals("float") || tipo2.equals("float")) {
+        tipo = "float";
+    } else if (tipo1.equals("int") && tipo2.equals("int")) {
+        tipo ="int";
+    } else {
+        tipo = "error";
+    }}
+    {return tipo;}
+}
+
+
+boolean verificarCompatibilidadTipos(String varType, String expr) : {
+    boolean compatible = false; // Variable para almacenar el resultado
+} {
+    {
+        // Reglas para validar compatibilidad de tipos
+        if (varType.equals("int") && expr.matches("[0-9]+")) {
+            compatible = true;
+        } else if (varType.equals("float") && expr.matches("[0-9]+(\\.[0-9]+)?")) {
+            compatible = true;
+        } else if (varType.equals("int") && expr.matches("[0-9]+") && varType.equals("float") && expr.matches("[0-9]+(\\.[0-9]+)?")) {
+            compatible = true;
+        }else if (varType.equals("boolean") && (expr.equals("true") || expr.equals("false"))) {
+            compatible = true;
+        } else if (varType.equals("string") && expr.startsWith("\"") && expr.endsWith("\"")) {
+            compatible = true;
+        }
+    }
+    { return compatible; }
 }
 
