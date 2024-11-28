@@ -121,7 +121,7 @@ public interface linkersConstants {
   /** RegularExpression Id. */
   int LETRA = 56;
   /** RegularExpression Id. */
-  int ANYTHING = 61;
+  int ANYTHING = 63;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -186,9 +186,11 @@ public interface linkersConstants {
     "<NUMERO>",
     "<LETRA>",
     "\" \"",
-    "\"\\r\"",
     "\"\\t\"",
+    "\"\\r\"",
     "\"\\n\"",
+    "<token of kind 61>",
+    "<token of kind 62>",
     "<ANYTHING>",
   };
 
