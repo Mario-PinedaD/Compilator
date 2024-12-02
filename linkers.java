@@ -341,7 +341,7 @@ if (token.kind == linkersConstants.IDENTIFICADOR) {
  */
   static final public void VariableINT() throws ParseException {Token id, num;
     int line, column;
-    String codigo_temporal;
+    String codigo_temporal = "";
     boolean control = false;
     try {
       jj_consume_token(TipoDatoEntero);
@@ -353,9 +353,10 @@ line = id.beginLine;
         try {
           jj_consume_token(CorcheteAbre);
 Token token = getNextToken();
-                    if (token.kind == linkersConstants.NUMERO) {
+                    if (token.kind == linkersConstants.NUMERO || linkers.declaredVariables.containsKey(token.image)) {
                         control = true;
                         linkers.checkAndAddVariable(id, "int[]", line, column);
+                        codigo_temporal = "\t int " + id.image + "[" + token.image + "]";
                     } else {
                         tabla.add("Error Sem\u00e1ntico -> Tama\u00f1o de arreglo inv\u00e1lido: " + token.image + " en l\u00ednea " + token.beginLine + ", columna " + token.beginColumn);
                     }
@@ -371,8 +372,8 @@ tabla.add("Error de Sintaxis -> " + e.getMessage());
       }
 if (!control) {
                 linkers.checkAndAddVariable(id, "int", line, column);
+                codigo_temporal = "\tint " + id.image;
             }
-            codigo_temporal = "\tint " + id.image;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case Asignacion:{
         jj_consume_token(Asignacion);
@@ -1649,9 +1650,10 @@ if (nextTokenIs(linkersConstants.ParentesisAbre)) {
             type = "error";
         }
 
-        if (token != null && !type.equals(expectedType) && !type.equals("error")) {
-            tabla.add("Error Sem\u00e1ntico -> Tipo incorrecto. Se esperaba: " + expectedType + " pero se obtuvo: " + type + " en l\u00ednea " + token.beginLine + ", columna " + token.beginColumn);
-        }
+        // if (token != null && !type.equals(expectedType) && !type.equals("error")) {
+        //     tabla.add("Error Semántico -> Tipo incorrecto. Se esperaba: " + expectedType + " pero se obtuvo: " + type + " en línea " + token.beginLine + ", columna " + token.beginColumn);
+        // }
+
     } catch (ParseException e) {
 tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
@@ -1789,30 +1791,24 @@ if (tipo1.equals("float") || tipo2.equals("float")) {
     finally { jj_save(3, xla); }
   }
 
-  static private boolean jj_3R_parteElseIf_965_13_18()
- {
-    if (jj_scan_token(CondicionalIf)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_asignacion_716_5_17()
+  static private boolean jj_3R_asignacion_717_5_17()
  {
     if (jj_scan_token(IDENTIFICADOR)) return true;
     if (jj_scan_token(Asignacion)) return true;
     return false;
   }
 
-  static private boolean jj_3R_parteElseIf_958_5_15()
+  static private boolean jj_3R_parteElseIf_959_5_15()
  {
     if (jj_scan_token(CondicionalElse)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_parteElseIf_965_13_18()) jj_scanpos = xsp;
+    if (jj_3R_parteElseIf_966_13_18()) jj_scanpos = xsp;
     if (jj_scan_token(LlaveAbre)) return true;
     return false;
   }
 
-  static private boolean jj_3R_parteElse_1011_5_16()
+  static private boolean jj_3R_parteElse_1012_5_16()
  {
     if (jj_scan_token(CondicionalElse)) return true;
     if (jj_scan_token(LlaveAbre)) return true;
@@ -1821,19 +1817,25 @@ if (tipo1.equals("float") || tipo2.equals("float")) {
 
   static private boolean jj_3_4()
  {
-    if (jj_3R_asignacion_716_5_17()) return true;
+    if (jj_3R_asignacion_717_5_17()) return true;
     return false;
   }
 
   static private boolean jj_3_1()
  {
-    if (jj_3R_parteElseIf_958_5_15()) return true;
+    if (jj_3R_parteElseIf_959_5_15()) return true;
     return false;
   }
 
   static private boolean jj_3_2()
  {
-    if (jj_3R_parteElse_1011_5_16()) return true;
+    if (jj_3R_parteElse_1012_5_16()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_parteElseIf_966_13_18()
+ {
+    if (jj_scan_token(CondicionalIf)) return true;
     return false;
   }
 
