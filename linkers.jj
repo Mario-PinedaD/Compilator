@@ -386,7 +386,7 @@ void declararVariables() : {} {
 void VariableINT() : {
     Token id, num;
     int line, column;
-    String codigo_temporal;
+    String codigo_temporal = "";
     boolean control = false;
 } {
     try {
@@ -400,9 +400,10 @@ void VariableINT() : {
             try {
                 <CorcheteAbre> {
                     Token token = getNextToken();
-                    if (token.kind == linkersConstants.NUMERO) {
+                    if (token.kind == linkersConstants.NUMERO || linkers.declaredVariables.containsKey(token.image)) {
                         control = true;
                         linkers.checkAndAddVariable(id, "int[]", line, column);
+                        codigo_temporal = "\t int " + id.image + "[" + token.image + "]";
                     } else {
                         tabla.add("Error Semántico -> Tamaño de arreglo inválido: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
                     }
@@ -415,8 +416,8 @@ void VariableINT() : {
         {
             if (!control) {
                 linkers.checkAndAddVariable(id, "int", line, column);
+                codigo_temporal = "\tint " + id.image;
             }
-            codigo_temporal = "\tint " + id.image;
         }
         [ <Asignacion> 
             try {
@@ -468,9 +469,10 @@ void VariableFLOAT() : {
             try {
                 <CorcheteAbre> {
                     Token token = getNextToken();
-                    if (token.kind == linkersConstants.NUMERO) {
+                    if (token.kind == linkersConstants.NUMERO || linkers.declaredVariables.containsKey(token.image)) {
                         control = true;
                         linkers.checkAndAddVariable(id, "float[]", line, column);
+                        codigo_temporal = "\t int " + id.image + "[" + token.image + "]";
                     } else {
                         tabla.add("Error Semántico -> Tamaño de arreglo inválido: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
                     }
@@ -483,8 +485,8 @@ void VariableFLOAT() : {
         {
             if (!control) {
                 linkers.checkAndAddVariable(id, "float", line, column);
+                codigo_temporal = "\tfloat " + id.image;
             }
-            codigo_temporal = "\tfloat " + id.image;
         }
         [ <Asignacion>
             try {
@@ -1429,9 +1431,10 @@ String factor(String expectedType) : {
             type = "error";
         }
     
-        if (token != null && !type.equals(expectedType) && !type.equals("error")) {
-            tabla.add("Error Semántico -> Tipo incorrecto. Se esperaba: " + expectedType + " pero se obtuvo: " + type + " en línea " + token.beginLine + ", columna " + token.beginColumn);
-        }}
+        // if (token != null && !type.equals(expectedType) && !type.equals("error")) {
+        //     tabla.add("Error Semántico -> Tipo incorrecto. Se esperaba: " + expectedType + " pero se obtuvo: " + type + " en línea " + token.beginLine + ", columna " + token.beginColumn);
+        // }
+    }
     } catch (ParseException e) {
         tabla.add("Error de Sintaxis -> " + e.getMessage());
     }
