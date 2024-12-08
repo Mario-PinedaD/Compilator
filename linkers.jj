@@ -83,27 +83,6 @@ class linkers {
         }
     }
 
-    // static void ejecutarCompilado(String file) {
-    //     ProcessBuilder pb = new ProcessBuilder(file);
-    //     try {
-    //         Process proceso = pb.start();
-    //         BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
-    //         BufferedReader errorReader = new BufferedReader(new InputStreamReader(proceso.getErrorStream()));
-    //         String line;
-    //         while ((line = reader.readLine()) != null) {
-    //             System.out.println(line);
-    //         }
-    //         while ((line = errorReader.readLine()) !=  null) {
-    //             System.err.println(line);
-    //         }
-    //         int exitCode = proceso.waitFor();
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     } catch (InterruptedException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
-
     static class CodigoCPP {
         private File file;
         public CodigoCPP(String path, String nombreFuente) {
@@ -157,9 +136,7 @@ class linkers {
             this.name = name;
         }
 
-        public Parameter() {
-
-        }
+        public Parameter() {}
     }
 
 }
@@ -176,7 +153,7 @@ TOKEN_MGR_DECLS : {
         } else {
             errorMessage += "\"" + curChar + "\" encontrado, pero esperaba más caracteres.";
         }
-        linkers.tabla.add(errorMessage); // Corregido para apuntar a 'tabla'
+        linkers.tabla.add(errorMessage); 
     }
 }
 
@@ -188,20 +165,13 @@ TOKEN: {//PALABRAS RESERVADAS
     | <CondicionalElse: "else"> 
     | <CondicionalSwitch: "Switch">
     | <CicloWhile: "While">
-    | <CicloFor: "For">
     | <Default: "Default">
     | <Caso: "Caso">
     | <Break: "Break">
     | <VERDADERO: "Verdadero">
     | <FALSO: "Falso">
-    | <PUBLICO: "Publico">
-    | <PRIVADO: "Privado">
-    | <NoRetorno: "NoRetorno">
     | <Start: "Start">
     | <End: "End">
-    | <Funcion: "Funcion">
-    | <Retorno: "Retorno">
-    | <LlamarFuncion: "call">
 }
 
 TOKEN: {// TIPOS DE DATO
@@ -285,9 +255,6 @@ void Programalink() : {}{
 
             try{<LlaveCierra> }catch(ParseException e){tabla.add("Error de Sintaxis -> " + e.getMessage());} )
 
-            // (procedimiento())*
-            // (funcion())*
-
             {
                 generador.escribirCPP(acumulador_cpp);
                 generador.escribirCPP("\tcout << \"\\nPresiona Enter para salir...\";\n");
@@ -313,10 +280,8 @@ void sentencias() : {} {
     | entrada()
     | salida()
     | condicionalIf()
-    | cicloFor()
     | cicloWhile()
     | condicionalSwitch()
-    // | llamadaFuncion()
 } 
 
 
@@ -396,28 +361,9 @@ void VariableINT() : {
             line = id.beginLine;
             column = id.beginColumn;
         }
-        (
-            try {
-                <CorcheteAbre> {
-                    Token token = getNextToken();
-                    if (token.kind == linkersConstants.NUMERO || linkers.declaredVariables.containsKey(token.image)) {
-                        control = true;
-                        linkers.checkAndAddVariable(id, "int[]", line, column);
-                        codigo_temporal = "\t int " + id.image + "[" + token.image + "]";
-                    } else {
-                        tabla.add("Error Semántico -> Tamaño de arreglo inválido: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
-                    }
-                }
-                <CorcheteCierra>
-            } catch (ParseException e) {
-                tabla.add("Error de Sintaxis -> " + e.getMessage());
-            }
-        )?
         {
-            if (!control) {
-                linkers.checkAndAddVariable(id, "int", line, column);
-                codigo_temporal = "\tint " + id.image;
-            }
+            linkers.checkAndAddVariable(id, "int", line, column);
+            codigo_temporal = "\tint " + id.image;
         }
         [ <Asignacion> 
             try {
@@ -455,7 +401,7 @@ void VariableINT() : {
 void VariableFLOAT() : {
     Token id, num;
     int line, column;
-    String codigo_temporal;
+    String codigo_temporal = "";
     boolean control = false;
 } {
     try {
@@ -465,28 +411,9 @@ void VariableFLOAT() : {
             line = id.beginLine;
             column = id.beginColumn;
         }
-        (
-            try {
-                <CorcheteAbre> {
-                    Token token = getNextToken();
-                    if (token.kind == linkersConstants.NUMERO || linkers.declaredVariables.containsKey(token.image)) {
-                        control = true;
-                        linkers.checkAndAddVariable(id, "float[]", line, column);
-                        codigo_temporal = "\t int " + id.image + "[" + token.image + "]";
-                    } else {
-                        tabla.add("Error Semántico -> Tamaño de arreglo inválido: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
-                    }
-                }
-                <CorcheteCierra>
-            } catch (ParseException e) {
-                tabla.add("Error de Sintaxis -> " + e.getMessage());
-            }
-        )?
         {
-            if (!control) {
-                linkers.checkAndAddVariable(id, "float", line, column);
-                codigo_temporal = "\tfloat " + id.image;
-            }
+            linkers.checkAndAddVariable(id, "float", line, column);
+            codigo_temporal = "\tfloat " + id.image;
         }
         [ <Asignacion>
             try {
@@ -536,26 +463,8 @@ void VariableBOOLEAN() : {
             line = id.beginLine;
             column = id.beginColumn;
         }
-        (
-            try {
-                <CorcheteAbre> {
-                    Token token = getNextToken();
-                    if (token.kind == linkersConstants.NUMERO) {
-                        control = true;
-                        linkers.checkAndAddVariable(id, "boolean[]", line, column);
-                    } else {
-                        tabla.add("Error Semántico -> Tamaño de arreglo inválido: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
-                    }
-                }
-                <CorcheteCierra>
-            } catch (ParseException e) {
-                tabla.add("Error de Sintaxis -> " + e.getMessage());
-            }
-        )?
         {
-            if (!control) {
-                linkers.checkAndAddVariable(id, "boolean", line, column);
-            }
+            linkers.checkAndAddVariable(id, "boolean", line, column);
             codigo_temporal = "\tbool " + id.image;
         }
         [ <Asignacion>
@@ -595,26 +504,8 @@ void VariableCADENA() : {
             line = id.beginLine;
             column = id.beginColumn;
         }
-        (
-            try {
-                <CorcheteAbre> {
-                    Token token = getNextToken();
-                    if (token.kind == linkersConstants.NUMERO) {
-                        control = true;
-                        linkers.checkAndAddVariable(id, "string[]", line, column);
-                    } else {
-                        tabla.add("Error Semántico -> Tamaño de arreglo inválido: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
-                    }
-                }
-                <CorcheteCierra>
-            } catch (ParseException e) {
-                tabla.add("Error de Sintaxis -> " + e.getMessage());
-            }
-        )?
         {
-            if (!control) {
-                linkers.checkAndAddVariable(id, "string", line, column);
-            }
+            linkers.checkAndAddVariable(id, "string", line, column);
             codigo_temporal = "\nstring " + id.image;
         }
         [ <Asignacion>
@@ -654,26 +545,8 @@ void VariableCARACTER() : {
             line = id.beginLine;
             column = id.beginColumn;
         }
-        (
-            try {
-                <CorcheteAbre> {
-                    Token token = getNextToken();
-                    if (token.kind == linkersConstants.NUMERO) {
-                        control = true;
-                        linkers.checkAndAddVariable(id, "char[]", line, column);
-                    } else {
-                        tabla.add("Error Semántico -> Tamaño de arreglo inválido: " + token.image + " en línea " + token.beginLine + ", columna " + token.beginColumn);
-                    }
-                }
-                <CorcheteCierra>
-            } catch (ParseException e) {
-                tabla.add("Error de Sintaxis -> " + e.getMessage());
-            }
-        )?
         {
-            if (!control) {
-                linkers.checkAndAddVariable(id, "char", line, column);
-            }
+            linkers.checkAndAddVariable(id, "char", line, column);
             codigo_temporal = "\tchar" + id.image;
         }
         [ <Asignacion>
@@ -729,11 +602,6 @@ void asignacion() : {
         {
             // Generar la expresión
             expr = expresion(varType);
-            
-            // // Validar que el tipo de la expresión sea compatible
-            // if (!verificarCompatibilidadTipos(varType, expr)) {
-            //     linkers.tabla.add("Error Semántico -> Tipo incompatible en la asignación. Se esperaba: " + varType + " pero se obtuvo algo diferente en línea " + id.beginLine + ", columna " + id.beginColumn);
-            // }
         }
         <DelimitadorLineaDeCodigo>
         {
@@ -1040,110 +908,6 @@ void parteElse() : {
     }
 }
 
-void cicloFor() : {
-    Token id, num, operador;
-    String varType = "";
-    String inicialización = "";
-    String condición = "";
-    String incremento = "";
-} {
-    try {
-        <CicloFor>
-        {
-            acumulador_cpp += "for (";
-        }
-        try {
-            <ParentesisAbre>
-        } catch (ParseException e) {
-            tabla.add("Error de Sintaxis -> " + e.getMessage());
-        }
-        LOOKAHEAD (3) declararVariables() | LOOKAHEAD(2) asignacion()
-        {
-            acumulador_cpp += " ";
-        }
-        condicion()
-        try {
-            <DelimitadorLineaDeCodigo>
-        } catch (ParseException e) {
-            tabla.add("Error de Sintaxis -> " + e.getMessage());
-        }
-        {
-            acumulador_cpp += "; ";
-        }
-        asignacionLogica()
-        try {
-            <ParentesisCierra>
-        } catch (ParseException e) {
-            tabla.add("Error de Sintaxis -> " + e.getMessage());
-        }
-        try {
-            <LlaveAbre>
-        } catch (ParseException e) {
-            tabla.add("Error de Sintaxis -> " + e.getMessage());
-        }
-
-        (sentencias())*
-
-        try {
-            <LlaveCierra>
-        } catch (ParseException e) {
-            tabla.add("Error de Sintaxis -> " + e.getMessage());
-        }
-        {
-            acumulador_cpp += "}\n";
-        }
-    } catch (ParseException e) {
-        tabla.add("Error de Sintaxis -> " + e.getMessage());
-    }
-}
-
-void asignacionLogica() : {
-    Token id, num;
-    Token operador = null;
-    String varType = "";
-    String oper = "";
-    String operator;
-    String incremento = "";
-} {
-    try {
-        id = <IDENTIFICADOR>
-        {
-            if (!linkers.declaredVariables.containsKey(id.image)) {
-                linkers.tabla.add("Error Semántico -> Variable no declarada: " + id.image + " en línea " + id.beginLine + ", columna " + id.beginColumn);
-            } else {
-                varType = linkers.declaredVariables.get(id.image);
-            }
-        }
-        (
-            (
-                operator = operadorAritmetico()
-            {
-                oper = expresion(varType);
-                if (!oper.equals(varType)) {
-                    linkers.tabla.add("Error Semántico -> Tipo incorrecto en la operación. Se esperaba: " + varType + " pero se obtuvo: " + oper + " en línea " + id.beginLine + ", columna " + id.beginColumn);
-                }
-            }
-            num = <NUMERO>
-            {
-                incremento = id.image + " " + operator + " " + num.image;
-            }
-            )
-            |
-            (
-                operador = <OperadorIncremento> | <OperadorDecremento>
-                {
-                    incremento = operador.image;    
-                }    
-            )
-        )+
-        {   
-            acumulador_cpp += incremento + ") {\n";
-        }
-    } catch (ParseException e) {
-        tabla.add("Error de Sintaxis -> " + e.getMessage());
-    }
-}
-
 void cicloWhile() : { } {
     try {
         <CicloWhile>
@@ -1430,10 +1194,6 @@ String factor(String expectedType) : {
         }  else {
             type = "error";
         }
-    
-        // if (token != null && !type.equals(expectedType) && !type.equals("error")) {
-        //     tabla.add("Error Semántico -> Tipo incorrecto. Se esperaba: " + expectedType + " pero se obtuvo: " + type + " en línea " + token.beginLine + ", columna " + token.beginColumn);
-        // }
     }
     } catch (ParseException e) {
         tabla.add("Error de Sintaxis -> " + e.getMessage());
